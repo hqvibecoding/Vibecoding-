@@ -49,7 +49,7 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
 
     // 1. Strict File Size Validation (Pre-upload)
     if (model && model.size > 10485760) {
-      alert("Upload Blocked: To ensure mobile performance, 3D models must be under 10MB. Please compress your asset.");
+      alert("Limit Exceeded: 3D models must be under 10MB to ensure high-speed loading and prevent crashes on mobile devices.");
       return;
     }
 
@@ -77,9 +77,9 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
         if (editingItem?.thumbnailPublicId) {
           await deleteFromCloudinary(editingItem.thumbnailPublicId);
         }
-        // 2. Cloudinary Optimization (Thumbnail Bandwidth)
-        // Inject /q_auto,f_auto/ into the returned secure_url
-        thumbnailUrl = thumbRes.url.replace("/upload/", "/upload/q_auto,f_auto/");
+        // 2. Cloudinary Optimization (High Quality)
+        // Inject /q_auto:best,f_auto/ into the returned secure_url
+        thumbnailUrl = thumbRes.url.replace("/upload/", "/upload/q_auto:best,f_auto/");
         thumbnailPublicId = thumbRes.publicId;
       }
 
@@ -200,6 +200,11 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("vault_auth");
+    onClose();
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -241,6 +246,12 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
               <div className="flex items-center gap-2 md:gap-4">
                 {view === "manage" && (
                   <>
+                    <button 
+                      onClick={handleLogout}
+                      className="px-4 py-2 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-red-500/10 transition-colors"
+                    >
+                      Logout
+                    </button>
                     <button 
                       onClick={() => setView("profile")}
                       className="px-6 py-2 border border-white/10 text-white text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-white/5 transition-colors"
@@ -336,7 +347,7 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
                             <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
                           </div>
                         ) : currentProfilePic ? (
-                          <img src={currentProfilePic.url} className="w-full h-full object-cover grayscale group-hover:opacity-40 transition-opacity" />
+                          <img src={currentProfilePic.url} className="w-full h-full object-cover group-hover:opacity-40 transition-opacity" />
                         ) : (
                           <div className="text-center">
                             <Upload className="w-6 h-6 opacity-20 group-hover:opacity-40 transition-opacity mx-auto mb-2" />
@@ -422,9 +433,9 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
                       <label className="flex flex-col items-center justify-center w-full aspect-video md:aspect-square bg-zinc-900 border border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-zinc-800/50 transition-colors group">
                         {model ? (
                           <div className="text-center px-4">
-                            <CheckCircle2 className={`w-8 h-8 mx-auto mb-2 ${model.size > 5242880 ? 'text-amber-500' : 'text-emerald-500'}`} />
+                            <CheckCircle2 className={`w-8 h-8 mx-auto mb-2 ${model.size > 8388608 ? 'text-amber-500' : 'text-emerald-500'}`} />
                             <p className="text-[10px] uppercase tracking-widest truncate max-w-full">{model.name}</p>
-                            {model.size > 5242880 && (
+                            {model.size > 8388608 && (
                               <p className="text-[8px] text-amber-500 mt-1">Warning: Large file ({Math.round(model.size / 1024 / 1024)}MB)</p>
                             )}
                           </div>
@@ -437,6 +448,7 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
                           <div className="text-center">
                             <Upload className="w-8 h-8 opacity-20 group-hover:opacity-40 transition-opacity mx-auto mb-3" />
                             <p className="text-[10px] uppercase tracking-widest opacity-40">Select GLB</p>
+                            <p className="text-[8px] uppercase tracking-widest opacity-20 mt-1">Max 10MB for Speed</p>
                           </div>
                         )}
                         <input type="file" accept=".glb" onChange={(e) => setModel(e.target.files?.[0] || null)} className="hidden" />

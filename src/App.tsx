@@ -37,6 +37,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const isAuth = localStorage.getItem("vault_auth") === "true";
+    if (isAuth) setIsAdminOpen(true);
+
     const itemsRef = ref(db, "archive");
     const unsubscribe = onValue(itemsRef, (snapshot) => {
       const data = snapshot.val();

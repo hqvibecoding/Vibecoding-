@@ -1,6 +1,6 @@
 import { Suspense, useMemo, useState, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Stage, useGLTF, ContactShadows, Environment, Center } from "@react-three/drei";
+import { OrbitControls, Stage, useGLTF, ContactShadows, Environment, Center, AdaptiveDpr, AdaptiveEvents } from "@react-three/drei";
 import { motion } from "motion/react";
 import { X, Loader2, AlertCircle } from "lucide-react";
 import { ArchiveItem } from "../types";
@@ -19,6 +19,10 @@ function Model({ url }: { url: string }) {
       if (obj.isMesh) {
         obj.castShadow = true;
         obj.receiveShadow = true;
+        // Optimization: Ensure materials are not too expensive
+        if (obj.material) {
+          obj.material.precision = 'mediump'; // Balance quality and performance
+        }
       }
     });
   }, [scene]);
@@ -31,7 +35,7 @@ function Loader() {
     <div className="absolute inset-0 flex items-center justify-center bg-black z-[55]">
       <div className="flex flex-col items-center gap-4">
         <Loader2 className="w-8 h-8 text-white animate-spin opacity-20" />
-        <p className="text-[10px] uppercase tracking-[0.5em] opacity-20">Loading Archive...</p>
+        <p className="text-[10px] uppercase tracking-[0.5em] opacity-20 animate-pulse">Optimizing Artifact...</p>
       </div>
     </div>
   );
@@ -71,7 +75,7 @@ export default function ModelViewer({ item, onClose }: ModelViewerProps) {
   const resetIdleTimer = () => {
     setIsIdle(false);
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    idleTimerRef.current = setTimeout(() => setIsIdle(true), 30000); // 30s idle
+    idleTimerRef.current = setTimeout(() => setIsIdle(true), 15000); // 15s idle for aggressive heat management
   };
 
   useEffect(() => {
@@ -110,24 +114,26 @@ export default function ModelViewer({ item, onClose }: ModelViewerProps) {
         <ErrorBoundary fallback={<ErrorFallback onClose={onClose} />}>
           <Canvas 
             shadows 
-            dpr={[1, 1.2]} 
+            dpr={[1, 2]} // High resolution for Retina displays
             camera={{ position: [0, 0, 4], fov: 45 }}
-            performance={{ min: 0.5 }}
+            performance={{ min: 0.5 }} // Allow dropping quality to maintain 60fps
             gl={{ 
-              antialias: false,
+              antialias: true,
               powerPreference: "high-performance",
               stencil: false,
-              depth: true
+              depth: true,
+              alpha: true,
+              precision: 'highp'
             }}
           >
             <Suspense fallback={null}>
-              <Environment preset="city" resolution={128} />
-              <Stage intensity={0.5} adjustCamera={true}>
+              <Environment preset="city" resolution={256} />
+              <Stage intensity={0.6} adjustCamera={true} environment="city">
                 <Center>
                   <Model url={item.modelUrl} />
                 </Center>
               </Stage>
-              <ContactShadows opacity={0.4} blur={2} far={10} />
+              <ContactShadows opacity={0.4} blur={2.5} far={10} />
               <OrbitControls 
                 autoRotate={!isIdle} 
                 autoRotateSpeed={0.5} 
@@ -136,6 +142,9 @@ export default function ModelViewer({ item, onClose }: ModelViewerProps) {
                 maxPolarAngle={Math.PI / 1.75} 
                 makeDefault
               />
+              {/* Performance Boosters */}
+              <AdaptiveDpr pixelated />
+              <AdaptiveEvents />
             </Suspense>
           </Canvas>
           

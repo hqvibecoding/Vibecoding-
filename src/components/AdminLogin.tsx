@@ -16,7 +16,8 @@ export default function AdminLogin({ isOpen, onClose, onLoginSuccess }: AdminLog
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === "jamesjames00741@gmail.com" && password === "James Bond 27") {
+    if (email.trim() === "jamesjames00741@gmail.com" && password === "James Bond 27") {
+      localStorage.setItem("vault_auth", "true");
       onLoginSuccess();
       onClose();
     } else {
