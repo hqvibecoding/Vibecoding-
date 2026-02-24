@@ -1,8 +1,9 @@
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { ArchiveItem } from "../types";
 import { useGLTF } from "@react-three/drei";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
+import { Loader2 } from "lucide-react";
 
 interface ArchiveGridProps {
   items: ArchiveItem[];
@@ -13,6 +14,7 @@ interface ArchiveGridProps {
 const DRACO_URL = "https://www.gstatic.com/draco/versioned/decoders/1.5.5/";
 
 function GridItem({ item, index, onClick }: { item: ArchiveItem, index: number, onClick: (item: ArchiveItem) => void }) {
+  const [isLoaded, setIsLoaded] = useState(false);
   const { ref, inView } = useInView({
     triggerOnce: true,
     rootMargin: '200px 0px',
@@ -28,8 +30,6 @@ function GridItem({ item, index, onClick }: { item: ArchiveItem, index: number, 
   // Helper to get optimized Cloudinary URL
   const getOptimizedUrl = (url: string) => {
     if (!url.includes("cloudinary.com")) return url;
-    // Inject quality and format parameters for HD results with fast loading
-    // f_auto: best format (WebP/AVIF), q_auto:best: highest quality, w_1200: HD width
     return url.replace("/upload/", "/upload/f_auto,q_auto:best,w_1200,c_limit/");
   };
 
@@ -49,11 +49,29 @@ function GridItem({ item, index, onClick }: { item: ArchiveItem, index: number, 
       className="group cursor-pointer"
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-[#0a0a0a] border border-white/5">
+        <AnimatePresence>
+          {!isLoaded && (
+            <motion.div 
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 flex items-center justify-center bg-[#0a0a0a] z-10"
+            >
+              <div className="flex flex-col items-center gap-2">
+                <Loader2 className="w-4 h-4 text-white animate-spin opacity-10" />
+                <span className="text-[8px] uppercase tracking-[0.3em] opacity-10">Loading HD</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <img
           src={getOptimizedUrl(item.thumbnailUrl)}
           alt={item.title}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-[2000ms] ease-[0.16,1,0.3,1] group-hover:scale-105"
+          onLoad={() => setIsLoaded(true)}
+          className={`w-full h-full object-cover transition-all duration-[2000ms] ease-[0.16,1,0.3,1] group-hover:scale-105 ${
+            isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-lg'
+          }`}
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-black/40 group-hover:bg-black/0 transition-colors duration-1000" />
