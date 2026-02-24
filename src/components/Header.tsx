@@ -14,6 +14,11 @@ export default function Header() {
     });
   }, []);
 
+  const getOptimizedUrl = (url: string) => {
+    if (!url.includes("cloudinary.com")) return url;
+    return url.replace("/upload/", "/upload/f_auto,q_auto:best,w_200,c_limit/");
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full z-[100] px-6 md:px-12 py-6 md:py-8 flex justify-between items-center pointer-events-none">
       <div className="pointer-events-auto">
@@ -35,7 +40,7 @@ export default function Header() {
         </a>
         <div className="w-9 h-9 rounded-full border border-white/20 overflow-hidden shadow-lg shadow-black/50">
           <img 
-            src={profilePic} 
+            src={getOptimizedUrl(profilePic)} 
             alt="Profile" 
             className="w-full h-full object-cover" 
           />

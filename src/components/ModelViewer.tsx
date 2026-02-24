@@ -1,6 +1,6 @@
 import { Suspense, useMemo, useState, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Stage, useGLTF, ContactShadows, Environment, Center, AdaptiveDpr, AdaptiveEvents } from "@react-three/drei";
+import { OrbitControls, Stage, useGLTF, ContactShadows, Environment, Center, AdaptiveDpr, AdaptiveEvents, useProgress } from "@react-three/drei";
 import { motion } from "motion/react";
 import { X, Loader2, AlertCircle } from "lucide-react";
 import { ArchiveItem } from "../types";
@@ -31,11 +31,26 @@ function Model({ url }: { url: string }) {
 }
 
 function Loader() {
+  const { progress } = useProgress();
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-black z-[55]">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className="w-8 h-8 text-white animate-spin opacity-20" />
-        <p className="text-[10px] uppercase tracking-[0.5em] opacity-20 animate-pulse">Optimizing Artifact...</p>
+      <div className="flex flex-col items-center gap-6">
+        <div className="relative w-12 h-12">
+          <Loader2 className="w-12 h-12 text-white animate-spin opacity-20" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[8px] font-mono opacity-40">{Math.round(progress)}%</span>
+          </div>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-[10px] uppercase tracking-[0.5em] opacity-20 animate-pulse">Synchronizing Artifact</p>
+          <div className="w-32 h-[1px] bg-white/5 overflow-hidden">
+            <motion.div 
+              className="h-full bg-white/20"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -114,7 +129,7 @@ export default function ModelViewer({ item, onClose }: ModelViewerProps) {
         <ErrorBoundary fallback={<ErrorFallback onClose={onClose} />}>
           <Canvas 
             shadows 
-            dpr={[1, 2]} // High resolution for Retina displays
+            dpr={[1, 2]} // High resolution for Retina displays, but capped at 2
             camera={{ position: [0, 0, 4], fov: 45 }}
             performance={{ min: 0.5 }} // Allow dropping quality to maintain 60fps
             gl={{ 
@@ -123,26 +138,34 @@ export default function ModelViewer({ item, onClose }: ModelViewerProps) {
               stencil: false,
               depth: true,
               alpha: true,
-              precision: 'highp'
+              precision: 'lowp', // Lower precision for materials to boost FPS on mobile
+              failIfMajorPerformanceCaveat: false
             }}
           >
             <Suspense fallback={null}>
-              <Environment preset="city" resolution={256} />
+              <Environment preset="city" resolution={128} />
               <Stage intensity={0.6} adjustCamera={true} environment="city">
                 <Center>
                   <Model url={item.modelUrl} />
                 </Center>
               </Stage>
-              <ContactShadows opacity={0.4} blur={2.5} far={10} />
+              <ContactShadows 
+                opacity={0.4} 
+                blur={2} 
+                far={10} 
+                resolution={256} // Lower resolution for better performance
+                frames={1} // Only render once for static models to save GPU
+              />
               <OrbitControls 
                 autoRotate={!isIdle} 
                 autoRotateSpeed={0.5} 
                 enablePan={false} 
+                enableDamping={true}
+                dampingFactor={0.05}
                 minPolarAngle={0} 
                 maxPolarAngle={Math.PI / 1.75} 
                 makeDefault
               />
-              {/* Performance Boosters */}
               <AdaptiveDpr pixelated />
               <AdaptiveEvents />
             </Suspense>

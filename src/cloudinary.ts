@@ -36,9 +36,14 @@ export const deleteFromCloudinary = async (publicId: string) => {
     });
 
     if (!response.ok) {
-      console.error("Failed to delete from Cloudinary");
+      const errorData = await response.json();
+      console.error("Cloudinary Delete Error:", errorData);
+      throw new Error(errorData.error || "Failed to delete from Cloudinary");
     }
+    
+    return await response.json();
   } catch (error) {
     console.error("Error deleting from Cloudinary:", error);
+    throw error;
   }
 };

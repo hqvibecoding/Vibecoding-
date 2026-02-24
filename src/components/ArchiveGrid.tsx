@@ -25,6 +25,14 @@ function GridItem({ item, index, onClick }: { item: ArchiveItem, index: number, 
     }
   }, [inView, item.modelUrl]);
 
+  // Helper to get optimized Cloudinary URL
+  const getOptimizedUrl = (url: string) => {
+    if (!url.includes("cloudinary.com")) return url;
+    // Inject quality and format parameters for HD results with fast loading
+    // f_auto: best format (WebP/AVIF), q_auto:best: highest quality, w_1200: HD width
+    return url.replace("/upload/", "/upload/f_auto,q_auto:best,w_1200,c_limit/");
+  };
+
   return (
     <motion.div
       ref={ref}
@@ -42,8 +50,9 @@ function GridItem({ item, index, onClick }: { item: ArchiveItem, index: number, 
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-[#0a0a0a] border border-white/5">
         <img
-          src={item.thumbnailUrl}
+          src={getOptimizedUrl(item.thumbnailUrl)}
           alt={item.title}
+          loading="lazy"
           className="w-full h-full object-cover transition-transform duration-[2000ms] ease-[0.16,1,0.3,1] group-hover:scale-105"
           referrerPolicy="no-referrer"
         />

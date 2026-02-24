@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Eye, EyeOff, X } from "lucide-react";
+import { Eye, EyeOff, X, Loader2 } from "lucide-react";
 
 interface AdminLoginProps {
   isOpen: boolean;
@@ -13,15 +13,25 @@ export default function AdminLogin({ isOpen, onClose, onLoginSuccess }: AdminLog
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim() === "jamesjames00741@gmail.com" && password === "James Bond 27") {
-      localStorage.setItem("vault_auth", "true");
-      onLoginSuccess();
-      onClose();
-    } else {
-      setError("Invalid credentials");
+    setIsLoading(true);
+    setError("");
+
+    try {
+      if (email.trim() === "jamesjames00741@gmail.com" && password === "James Bond 27") {
+        localStorage.setItem("vault_auth", "true");
+        onLoginSuccess();
+        onClose();
+      } else {
+        setError("Invalid credentials");
+      }
+    } catch (err: any) {
+      setError("Login Failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,9 +96,10 @@ export default function AdminLogin({ isOpen, onClose, onLoginSuccess }: AdminLog
 
               <button
                 type="submit"
-                className="w-full bg-white text-black py-3 rounded-lg text-sm font-semibold uppercase tracking-widest hover:bg-zinc-200 transition-colors"
+                disabled={isLoading}
+                className="w-full bg-white text-black py-3 rounded-lg text-sm font-semibold uppercase tracking-widest hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2"
               >
-                Enter Vault
+                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Enter Vault"}
               </button>
             </form>
           </motion.div>

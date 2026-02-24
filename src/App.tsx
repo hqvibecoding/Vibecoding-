@@ -37,9 +37,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    // Just check if they were logged in, but don't auto-open the panel
     const isAuth = localStorage.getItem("vault_auth") === "true";
-    if (isAuth) setIsAdminOpen(true);
-
+    
     const itemsRef = ref(db, "archive");
     const unsubscribe = onValue(itemsRef, (snapshot) => {
       const data = snapshot.val();

@@ -27,14 +27,29 @@ async function startServer() {
     }
 
     try {
-      // Determine if it's an image or a raw file (GLB)
-      // GLB files are usually uploaded as 'raw' or 'image' depending on Cloudinary config
-      // But we can try to delete as image first, then raw if it fails, or just use resource_type: 'auto'
-      const result = await cloudinary.uploader.destroy(publicId, { resource_type: 'auto' });
+      if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+        return res.status(500).json({ 
+          error: "Cloudinary Configuration Missing", 
+          details: "Please set CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET in AI Studio Secrets." 
+        });
+      }
+
+      // Try deleting as image first (most common for thumbnails)
+      let result = await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+      
+      // If not found or failed, try as raw (common for GLB files)
+      if (result.result !== 'ok') {
+        result = await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+      }
+
+      console.log(`Cloudinary delete result for ${publicId}:`, result);
       res.json({ success: true, result });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Cloudinary delete error:", error);
-      res.status(500).json({ error: "Failed to delete from Cloudinary" });
+      res.status(500).json({ 
+        error: "Failed to delete from Cloudinary", 
+        details: error?.message || String(error) 
+      });
     }
   });
 

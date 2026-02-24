@@ -186,6 +186,8 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
   };
 
   const handleDelete = async (item: ArchiveItem) => {
+    setIsUploading(true);
+    setStatus("idle");
     try {
       // Delete from Cloudinary
       if (item.thumbnailPublicId) await deleteFromCloudinary(item.thumbnailPublicId);
@@ -195,8 +197,14 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
       const itemRef = ref(db, `archive/${item.id}`);
       await remove(itemRef);
       setDeleteConfirmId(null);
+      setStatus("success");
+      setTimeout(() => setStatus("idle"), 1500);
     } catch (error) {
       console.error("Delete failed:", error);
+      setStatus("error");
+      setTimeout(() => setStatus("idle"), 3000);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -239,7 +247,13 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
                     {view === "manage" ? "Manage Archive" : view === "profile" ? "Profile Settings" : editingItem ? "Edit Asset" : "Archive New Asset"}
                   </h2>
                   <p className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] opacity-40">
-                    {view === "manage" ? `${items.length} Assets in Vault` : "Fill in the details below"}
+                    {status === "error" ? (
+                      <span className="text-red-500 animate-pulse">Error: Check Secrets & Firebase Rules</span>
+                    ) : status === "success" ? (
+                      <span className="text-emerald-500">Operation Successful</span>
+                    ) : (
+                      view === "manage" ? `${items.length} Assets in Vault` : "Fill in the details below"
+                    )}
                   </p>
                 </div>
               </div>
@@ -471,10 +485,20 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
                         <CheckCircle2 className="w-5 h-5" />
                         {editingItem ? "Updated Successfully" : "Archived Successfully"}
                       </>
+                    ) : status === "error" ? (
+                      <>
+                        <X className="w-5 h-5 text-red-500" />
+                        Operation Failed
+                      </>
                     ) : (
                       editingItem ? "Update Asset" : "Archive Asset"
                     )}
                   </button>
+                  {status === "error" && (
+                    <p className="text-red-500 text-[10px] uppercase tracking-widest text-center animate-pulse">
+                      Check console for details or verify Cloudinary/Firebase config
+                    </p>
+                  )}
                 </form>
               )}
             </div>
