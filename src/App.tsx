@@ -18,6 +18,11 @@ export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === "dark" ? "light" : "dark");
+  };
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -69,19 +74,21 @@ export default function App() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#050505] text-[#F5F5F5] selection:bg-white selection:text-black">
+    <main className={`min-h-screen transition-colors duration-700 selection:bg-white selection:text-black ${
+      theme === "dark" ? "bg-[#050505] text-[#F5F5F5]" : "bg-[#F5F5F5] text-[#050505]"
+    }`}>
       <div className="noise-overlay" />
-      {!selectedItem && <Header />}
+      {!selectedItem && <Header theme={theme} onThemeToggle={toggleTheme} />}
       
-      <Hero />
+      <Hero theme={theme} />
       
       {isLoading ? (
         <div className="flex items-center justify-center py-64">
-          <div className="w-12 h-12 border border-white/10 border-t-white rounded-full animate-spin" />
+          <div className={`w-12 h-12 border border-current border-t-transparent rounded-full animate-spin opacity-20`} />
         </div>
       ) : (
         <div className="py-20 md:py-40">
-          <ArchiveGrid items={items} onItemClick={setSelectedItem} />
+          <ArchiveGrid items={items} onItemClick={setSelectedItem} theme={theme} />
         </div>
       )}
 
@@ -89,11 +96,8 @@ export default function App() {
         {selectedItem && (
           <ModelViewer 
             key={selectedItem.id}
-            item={{
-              ...selectedItem,
-              // Add cache buster to ensure instant opening of fresh uploads
-              modelUrl: `${selectedItem.modelUrl}${selectedItem.modelUrl.includes('?') ? '&' : '?'}t=${Date.now()}`
-            }} 
+            theme={theme}
+            item={selectedItem} 
             onClose={() => setSelectedItem(null)} 
           />
         )}
@@ -111,7 +115,7 @@ export default function App() {
         items={items}
       />
 
-      {!selectedItem && <Footer onAdminClick={() => setIsLoginOpen(true)} />}
+      {!selectedItem && <Footer onAdminClick={() => setIsLoginOpen(true)} theme={theme} />}
     </main>
   );
 }

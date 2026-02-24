@@ -10,62 +10,50 @@ import ErrorBoundary from "./ErrorBoundary";
 const DRACO_URL = "https://www.gstatic.com/draco/versioned/decoders/1.5.5/";
 
 function Model({ url }: { url: string }) {
-  // useGLTF with Draco support
   const { scene } = useGLTF(url, DRACO_URL);
-  const [visible, setVisible] = useState(false);
   
-  // Clean up and optimize the scene
   useMemo(() => {
     scene.traverse((obj: any) => {
       if (obj.isMesh) {
         obj.castShadow = true;
         obj.receiveShadow = true;
         if (obj.material) {
-          obj.material.precision = 'mediump';
+          obj.material.precision = 'lowp'; // Aggressive optimization for mobile
         }
       }
     });
   }, [scene]);
 
-  useEffect(() => {
-    // Small delay for smooth reveal after suspense resolves
-    const timer = setTimeout(() => setVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <primitive 
-      object={scene} 
-      scale={visible ? 1 : 0} 
-      visible={visible}
-      onUpdate={(self: any) => {
-        if (visible && self.scale.x < 1) {
-          self.scale.lerp({ x: 1, y: 1, z: 1 }, 0.1);
-        }
-      }}
-    />
-  );
+  return <primitive object={scene} />;
 }
 
-function Loader() {
+function Loader({ theme = "dark" }: { theme?: "dark" | "light" }) {
   const { progress } = useProgress();
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-2xl z-[55]">
+    <div className={`absolute inset-0 flex items-center justify-center backdrop-blur-2xl z-[55] transition-colors duration-700 ${
+      theme === "dark" ? "bg-black/80" : "bg-white/80"
+    }`}>
       <div className="flex flex-col items-center gap-8">
         <div className="relative w-20 h-20">
-          <Loader2 className="w-20 h-20 text-white animate-spin opacity-10" />
+          <Loader2 className={`w-20 h-20 animate-spin opacity-10 ${theme === "dark" ? "text-white" : "text-black"}`} />
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-[10px] font-mono tracking-widest opacity-60">{Math.round(progress)}%</span>
+            <span className={`text-[10px] font-mono tracking-widest opacity-60 ${theme === "dark" ? "text-white" : "text-black"}`}>
+              {Math.round(progress)}%
+            </span>
           </div>
         </div>
         <div className="flex flex-col items-center gap-4">
           <div className="flex flex-col items-center gap-1">
-            <p className="text-[10px] uppercase tracking-[0.6em] opacity-40 animate-pulse">Synchronizing Archive</p>
-            <p className="text-[8px] uppercase tracking-[0.4em] opacity-20">Decrypting 3D Artifact</p>
+            <p className={`text-[10px] uppercase tracking-[0.6em] opacity-40 animate-pulse ${theme === "dark" ? "text-white" : "text-black"}`}>
+              Synchronizing Archive
+            </p>
+            <p className={`text-[8px] uppercase tracking-[0.4em] opacity-20 ${theme === "dark" ? "text-white" : "text-black"}`}>
+              Decrypting 3D Artifact
+            </p>
           </div>
-          <div className="w-48 h-[1px] bg-white/5 overflow-hidden rounded-full">
+          <div className={`w-48 h-[1px] overflow-hidden rounded-full ${theme === "dark" ? "bg-white/5" : "bg-black/5"}`}>
             <motion.div 
-              className="h-full bg-white/40 shadow-[0_0_10px_rgba(255,255,255,0.3)]"
+              className={`h-full shadow-[0_0_10px_rgba(255,255,255,0.3)] ${theme === "dark" ? "bg-white/40" : "bg-black/40"}`}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ type: "spring", stiffness: 50, damping: 20 }}
@@ -102,9 +90,10 @@ function ErrorFallback({ onClose }: { onClose: () => void }) {
 interface ModelViewerProps {
   item: ArchiveItem;
   onClose: () => void;
+  theme?: "dark" | "light";
 }
 
-export default function ModelViewer({ item, onClose }: ModelViewerProps) {
+export default function ModelViewer({ item, onClose, theme = "dark" }: ModelViewerProps) {
   const [isIdle, setIsIdle] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -130,14 +119,20 @@ export default function ModelViewer({ item, onClose }: ModelViewerProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black flex flex-col"
+      className={`fixed inset-0 z-50 flex flex-col transition-colors duration-700 ${
+        theme === "dark" ? "bg-black text-white" : "bg-white text-black"
+      }`}
     >
       <div className="absolute top-6 right-6 md:top-8 md:right-8 z-[60]">
         <button
           onClick={onClose}
-          className="p-3 md:p-4 rounded-full border border-white/10 bg-black/50 backdrop-blur-md md:bg-transparent hover:bg-white/10 transition-colors group"
+          className={`p-3 md:p-4 rounded-full border backdrop-blur-md transition-colors group ${
+            theme === "dark" ? "border-white/10 bg-black/50 hover:bg-white/10" : "border-black/10 bg-white/50 hover:bg-black/10"
+          }`}
         >
-          <X className="w-5 h-5 md:w-6 md:h-6 text-white opacity-50 group-hover:opacity-100 transition-opacity" />
+          <X className={`w-5 h-5 md:w-6 md:h-6 opacity-50 group-hover:opacity-100 transition-opacity ${
+            theme === "dark" ? "text-white" : "text-black"
+          }`} />
         </button>
       </div>
 
@@ -164,18 +159,23 @@ export default function ModelViewer({ item, onClose }: ModelViewerProps) {
             }}
           >
             <Suspense fallback={null}>
+              <color attach="background" args={[theme === "dark" ? "#000000" : "#ffffff"]} />
               <Environment preset="city" resolution={128} />
-              <Stage intensity={0.6} adjustCamera={true} environment="city">
+              <Stage 
+                intensity={theme === "dark" ? 0.6 : 1.2} 
+                adjustCamera={true} 
+                environment="city"
+              >
                 <Center>
                   <Model url={item.modelUrl} />
                 </Center>
               </Stage>
               <ContactShadows 
-                opacity={0.4} 
+                opacity={theme === "dark" ? 0.4 : 0.2} 
                 blur={2} 
                 far={10} 
-                resolution={256} // Lower resolution for better performance
-                frames={1} // Only render once for static models to save GPU
+                resolution={256} 
+                frames={1} 
               />
               <OrbitControls 
                 autoRotate={!isIdle} 
@@ -193,13 +193,15 @@ export default function ModelViewer({ item, onClose }: ModelViewerProps) {
           </Canvas>
           
           {isIdle && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-[58] pointer-events-none">
+            <div className={`absolute inset-0 flex items-center justify-center backdrop-blur-sm z-[58] pointer-events-none ${
+              theme === "dark" ? "bg-black/40" : "bg-white/40"
+            }`}>
               <p className="text-[10px] uppercase tracking-[0.5em] opacity-40">Power Saving Mode Active</p>
             </div>
           )}
           
           {/* Overlay Loader that stays until Suspense resolves */}
-          <Suspense fallback={<Loader />}>
+          <Suspense fallback={<Loader theme={theme} />}>
             <ModelPreloader url={item.modelUrl} />
           </Suspense>
         </ErrorBoundary>

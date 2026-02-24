@@ -1,10 +1,12 @@
 import { motion } from "motion/react";
 
-export default function Hero() {
+export default function Hero({ theme = "dark" }: { theme?: "dark" | "light" }) {
   return (
     <section className="relative h-screen flex flex-col items-center justify-center px-8 overflow-hidden">
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-radial-gradient from-white/5 to-transparent opacity-30" />
+        <div className={`absolute inset-0 bg-radial-gradient opacity-30 ${
+          theme === "dark" ? "from-white/5 to-transparent" : "from-black/5 to-transparent"
+        }`} />
       </div>
 
       <div className="relative z-10 text-center space-y-12">
@@ -40,7 +42,9 @@ export default function Hero() {
           <motion.div 
             animate={{ y: ["-100%", "100%"] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 bg-gradient-to-b from-transparent via-white/30 to-transparent"
+            className={`absolute inset-0 bg-gradient-to-b from-transparent to-transparent ${
+              theme === "dark" ? "via-white/30" : "via-black/30"
+            }`}
           />
         </div>
       </motion.div>
