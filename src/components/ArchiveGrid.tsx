@@ -22,8 +22,9 @@ function GridItem({ item, index, onClick }: { item: ArchiveItem, index: number, 
 
   useEffect(() => {
     if (inView && item.modelUrl) {
-      // Preload when item enters viewport
-      useGLTF.preload(item.modelUrl, DRACO_URL);
+      // Preload with cache buster to match App.tsx
+      const preUrl = `${item.modelUrl}${item.modelUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+      useGLTF.preload(preUrl, DRACO_URL);
     }
   }, [inView, item.modelUrl]);
 
@@ -45,7 +46,12 @@ function GridItem({ item, index, onClick }: { item: ArchiveItem, index: number, 
         delay: (index % 2) * 0.2 
       }}
       onClick={() => onClick(item)}
-      onMouseEnter={() => item.modelUrl && useGLTF.preload(item.modelUrl, DRACO_URL)}
+      onMouseEnter={() => {
+        if (item.modelUrl) {
+          const preUrl = `${item.modelUrl}${item.modelUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+          useGLTF.preload(preUrl, DRACO_URL);
+        }
+      }}
       className="group cursor-pointer"
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-[#0a0a0a] border border-white/5">

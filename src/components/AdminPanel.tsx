@@ -73,20 +73,22 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
       const [thumbRes, modelRes] = await Promise.all(uploadPromises);
 
       if (thumbRes) {
-        // If editing, delete old thumbnail from Cloudinary
+        // If editing, try to delete old thumbnail, but don't block if it fails
         if (editingItem?.thumbnailPublicId) {
-          await deleteFromCloudinary(editingItem.thumbnailPublicId);
+          deleteFromCloudinary(editingItem.thumbnailPublicId).catch(err => 
+            console.warn("Cloudinary cleanup skipped (Normal on Netlify):", err.message)
+          );
         }
-        // 2. Cloudinary Optimization (High Quality)
-        // Inject /q_auto:best,f_auto/ into the returned secure_url
         thumbnailUrl = thumbRes.url.replace("/upload/", "/upload/q_auto:best,f_auto/");
         thumbnailPublicId = thumbRes.publicId;
       }
 
       if (modelRes) {
-        // If editing, delete old model from Cloudinary
+        // If editing, try to delete old model, but don't block if it fails
         if (editingItem?.modelPublicId) {
-          await deleteFromCloudinary(editingItem.modelPublicId);
+          deleteFromCloudinary(editingItem.modelPublicId).catch(err => 
+            console.warn("Cloudinary cleanup skipped (Normal on Netlify):", err.message)
+          );
         }
         modelUrl = modelRes.url;
         modelPublicId = modelRes.publicId;
@@ -189,11 +191,19 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
     setIsUploading(true);
     setStatus("idle");
     try {
-      // Delete from Cloudinary
-      if (item.thumbnailPublicId) await deleteFromCloudinary(item.thumbnailPublicId);
-      if (item.modelPublicId) await deleteFromCloudinary(item.modelPublicId);
+      // Try to delete from Cloudinary in background
+      if (item.thumbnailPublicId) {
+        deleteFromCloudinary(item.thumbnailPublicId).catch(err => 
+          console.warn("Cloudinary cleanup skipped:", err.message)
+        );
+      }
+      if (item.modelPublicId) {
+        deleteFromCloudinary(item.modelPublicId).catch(err => 
+          console.warn("Cloudinary cleanup skipped:", err.message)
+        );
+      }
 
-      // Delete from Firebase
+      // Always delete from Firebase (Source of Truth)
       const itemRef = ref(db, `archive/${item.id}`);
       await remove(itemRef);
       setDeleteConfirmId(null);

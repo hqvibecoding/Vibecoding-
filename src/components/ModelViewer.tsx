@@ -12,6 +12,7 @@ const DRACO_URL = "https://www.gstatic.com/draco/versioned/decoders/1.5.5/";
 function Model({ url }: { url: string }) {
   // useGLTF with Draco support
   const { scene } = useGLTF(url, DRACO_URL);
+  const [visible, setVisible] = useState(false);
   
   // Clean up and optimize the scene
   useMemo(() => {
@@ -19,35 +20,55 @@ function Model({ url }: { url: string }) {
       if (obj.isMesh) {
         obj.castShadow = true;
         obj.receiveShadow = true;
-        // Optimization: Ensure materials are not too expensive
         if (obj.material) {
-          obj.material.precision = 'mediump'; // Balance quality and performance
+          obj.material.precision = 'mediump';
         }
       }
     });
   }, [scene]);
 
-  return <primitive object={scene} />;
+  useEffect(() => {
+    // Small delay for smooth reveal after suspense resolves
+    const timer = setTimeout(() => setVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <primitive 
+      object={scene} 
+      scale={visible ? 1 : 0} 
+      visible={visible}
+      onUpdate={(self: any) => {
+        if (visible && self.scale.x < 1) {
+          self.scale.lerp({ x: 1, y: 1, z: 1 }, 0.1);
+        }
+      }}
+    />
+  );
 }
 
 function Loader() {
   const { progress } = useProgress();
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-black z-[55]">
-      <div className="flex flex-col items-center gap-6">
-        <div className="relative w-12 h-12">
-          <Loader2 className="w-12 h-12 text-white animate-spin opacity-20" />
+    <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-2xl z-[55]">
+      <div className="flex flex-col items-center gap-8">
+        <div className="relative w-20 h-20">
+          <Loader2 className="w-20 h-20 text-white animate-spin opacity-10" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-[8px] font-mono opacity-40">{Math.round(progress)}%</span>
+            <span className="text-[10px] font-mono tracking-widest opacity-60">{Math.round(progress)}%</span>
           </div>
         </div>
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-[10px] uppercase tracking-[0.5em] opacity-20 animate-pulse">Synchronizing Artifact</p>
-          <div className="w-32 h-[1px] bg-white/5 overflow-hidden">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-[10px] uppercase tracking-[0.6em] opacity-40 animate-pulse">Synchronizing Archive</p>
+            <p className="text-[8px] uppercase tracking-[0.4em] opacity-20">Decrypting 3D Artifact</p>
+          </div>
+          <div className="w-48 h-[1px] bg-white/5 overflow-hidden rounded-full">
             <motion.div 
-              className="h-full bg-white/20"
+              className="h-full bg-white/40 shadow-[0_0_10px_rgba(255,255,255,0.3)]"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
+              transition={{ type: "spring", stiffness: 50, damping: 20 }}
             />
           </div>
         </div>

@@ -45,8 +45,11 @@ export default function App() {
       const data = snapshot.val();
       if (data) {
         const itemList = Object.values(data) as ArchiveItem[];
-        itemList.sort((a, b) => b.createdAt - a.createdAt);
-        setItems(itemList);
+        // Randomize order on every refresh for a dynamic feel
+        const shuffled = itemList.sort(() => Math.random() - 0.5);
+        setItems(shuffled);
+      } else {
+        setItems([]);
       }
       setIsLoading(false);
     });
@@ -82,11 +85,15 @@ export default function App() {
         </div>
       )}
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {selectedItem && (
           <ModelViewer 
             key={selectedItem.id}
-            item={selectedItem} 
+            item={{
+              ...selectedItem,
+              // Add cache buster to ensure instant opening of fresh uploads
+              modelUrl: `${selectedItem.modelUrl}${selectedItem.modelUrl.includes('?') ? '&' : '?'}t=${Date.now()}`
+            }} 
             onClose={() => setSelectedItem(null)} 
           />
         )}
