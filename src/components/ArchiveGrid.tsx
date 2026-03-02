@@ -30,7 +30,9 @@ function GridItem({ item, index, onClick, theme = "dark" }: { item: ArchiveItem,
   // Helper to get optimized Cloudinary URL
   const getOptimizedUrl = (url: string) => {
     if (!url.includes("cloudinary.com")) return url;
-    return url.replace("/upload/", "/upload/f_auto,q_auto:best,w_1200,c_limit/");
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const width = isMobile ? 600 : 1200;
+    return url.replace("/upload/", `/upload/f_auto,q_auto:best,w_${width},c_limit/`);
   };
 
   return (

@@ -18,10 +18,33 @@ function Model({ url }: { url: string }) {
         obj.castShadow = true;
         obj.receiveShadow = true;
         if (obj.material) {
-          obj.material.precision = 'lowp'; // Aggressive optimization for mobile
+          obj.material.precision = 'lowp';
+          // Optimize textures if they exist
+          if (obj.material.map) obj.material.map.anisotropy = 4;
+        }
+        // Optimize geometry
+        if (obj.geometry) {
+          obj.geometry.computeBoundingSphere();
+          obj.geometry.computeBoundingBox();
         }
       }
     });
+  }, [scene]);
+
+  // Cleanup scene on unmount to free GPU memory
+  useEffect(() => {
+    return () => {
+      scene.traverse((obj: any) => {
+        if (obj.isMesh) {
+          obj.geometry.dispose();
+          if (Array.isArray(obj.material)) {
+            obj.material.forEach((m: any) => m.dispose());
+          } else {
+            obj.material.dispose();
+          }
+        }
+      });
+    };
   }, [scene]);
 
   return <primitive object={scene} />;
@@ -29,6 +52,18 @@ function Model({ url }: { url: string }) {
 
 function Loader({ theme = "dark" }: { theme?: "dark" | "light" }) {
   const { progress } = useProgress();
+  const [status, setStatus] = useState("Synchronizing Archive");
+
+  useEffect(() => {
+    if (progress === 100) {
+      setStatus("Optimizing Scene");
+    } else if (progress > 80) {
+      setStatus("Finalizing Download");
+    } else if (progress > 50) {
+      setStatus("Processing Artifact");
+    }
+  }, [progress]);
+
   return (
     <div className={`absolute inset-0 flex items-center justify-center backdrop-blur-2xl z-[55] transition-colors duration-700 ${
       theme === "dark" ? "bg-black/80" : "bg-white/80"
@@ -45,10 +80,10 @@ function Loader({ theme = "dark" }: { theme?: "dark" | "light" }) {
         <div className="flex flex-col items-center gap-4">
           <div className="flex flex-col items-center gap-1">
             <p className={`text-[10px] uppercase tracking-[0.6em] opacity-40 animate-pulse ${theme === "dark" ? "text-white" : "text-black"}`}>
-              Synchronizing Archive
+              {status}
             </p>
             <p className={`text-[8px] uppercase tracking-[0.4em] opacity-20 ${theme === "dark" ? "text-white" : "text-black"}`}>
-              Decrypting 3D Artifact
+              {progress === 100 ? "Preparing GPU Shaders" : "Decrypting 3D Artifact"}
             </p>
           </div>
           <div className={`w-48 h-[1px] overflow-hidden rounded-full ${theme === "dark" ? "bg-white/5" : "bg-black/5"}`}>
@@ -95,7 +130,17 @@ interface ModelViewerProps {
 
 export default function ModelViewer({ item, onClose, theme = "dark" }: ModelViewerProps) {
   const [isIdle, setIsIdle] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const resetIdleTimer = () => {
     setIsIdle(false);
@@ -144,12 +189,12 @@ export default function ModelViewer({ item, onClose, theme = "dark" }: ModelView
       <div className="flex-1 w-full h-full relative">
         <ErrorBoundary fallback={<ErrorFallback onClose={onClose} />}>
           <Canvas 
-            shadows 
-            dpr={[1, 2]} // High resolution for Retina displays, but capped at 2
+            shadows={!isMobile} // Disable shadows on mobile for performance
+            dpr={isMobile ? [1, 1.5] : [1, 2]} // Lower DPR for mobile
             camera={{ position: [0, 0, 4], fov: 45 }}
             performance={{ min: 0.5 }} // Allow dropping quality to maintain 60fps
             gl={{ 
-              antialias: true,
+              antialias: !isMobile, // Disable antialias on mobile for FPS boost
               powerPreference: "high-performance",
               stencil: false,
               depth: true,
@@ -160,23 +205,26 @@ export default function ModelViewer({ item, onClose, theme = "dark" }: ModelView
           >
             <Suspense fallback={null}>
               <color attach="background" args={[theme === "dark" ? "#000000" : "#ffffff"]} />
-              <Environment preset="city" resolution={128} />
+              <Environment preset="city" resolution={isMobile ? 64 : 128} />
               <Stage 
                 intensity={theme === "dark" ? 0.6 : 1.2} 
                 adjustCamera={true} 
                 environment="city"
+                shadows={!isMobile} // Disable stage shadows on mobile
               >
                 <Center>
                   <Model url={item.modelUrl} />
                 </Center>
               </Stage>
-              <ContactShadows 
-                opacity={theme === "dark" ? 0.4 : 0.2} 
-                blur={2} 
-                far={10} 
-                resolution={256} 
-                frames={1} 
-              />
+              {!isMobile && (
+                <ContactShadows 
+                  opacity={theme === "dark" ? 0.4 : 0.2} 
+                  blur={2} 
+                  far={10} 
+                  resolution={256} 
+                  frames={1} 
+                />
+              )}
               <OrbitControls 
                 autoRotate={!isIdle} 
                 autoRotateSpeed={0.5} 

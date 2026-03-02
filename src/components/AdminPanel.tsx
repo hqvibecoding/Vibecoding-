@@ -21,6 +21,7 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
   const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
   const [currentProfilePic, setCurrentProfilePic] = useState<{url: string, publicId: string} | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
@@ -49,11 +50,12 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
 
     // 1. Strict File Size Validation (Pre-upload)
     if (model && model.size > 10485760) {
-      alert("Limit Exceeded: 3D models must be under 10MB to ensure high-speed loading and prevent crashes on mobile devices.");
+      alert("Cloudinary Limit: On the Free Plan, 3D models (.glb) must be under 10MB. Please compress your file or upgrade Cloudinary.");
       return;
     }
 
     setIsUploading(true);
+    setUploadProgress(0);
     setStatus("idle");
 
     try {
@@ -64,10 +66,10 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
 
       // Parallelize uploads if new files are selected
       const uploadPromises = [];
-      if (thumbnail) uploadPromises.push(uploadToCloudinary(thumbnail));
+      if (thumbnail) uploadPromises.push(uploadToCloudinary(thumbnail, (p) => setUploadProgress(prev => (prev + p) / 2)));
       else uploadPromises.push(Promise.resolve(null));
 
-      if (model) uploadPromises.push(uploadToCloudinary(model));
+      if (model) uploadPromises.push(uploadToCloudinary(model, (p) => setUploadProgress(prev => (prev + p) / 2)));
       else uploadPromises.push(Promise.resolve(null));
 
       const [thumbRes, modelRes] = await Promise.all(uploadPromises);
@@ -140,6 +142,7 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
     if (!profilePicFile) return;
 
     setIsUploading(true);
+    setUploadProgress(0);
     setStatus("idle");
 
     try {
@@ -148,7 +151,7 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
         await deleteFromCloudinary(currentProfilePic.publicId);
       }
 
-      const res = await uploadToCloudinary(profilePicFile);
+      const res = await uploadToCloudinary(profilePicFile, setUploadProgress);
       if (res) {
         const profileRef = ref(db, "settings/profilePic");
         await set(profileRef, {
@@ -386,10 +389,22 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
                     <button
                       type="submit"
                       disabled={isUploading || !profilePicFile}
-                      className="w-full bg-white text-black py-4 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3"
+                      className="w-full bg-white text-black py-4 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex flex-col items-center justify-center gap-2"
                     >
                       {isUploading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <>
+                          <div className="flex items-center gap-3">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Uploading {Math.round(uploadProgress)}%</span>
+                          </div>
+                          <div className="w-full h-[2px] bg-black/10 mt-2 rounded-full overflow-hidden">
+                            <motion.div 
+                              className="h-full bg-black"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${uploadProgress}%` }}
+                            />
+                          </div>
+                        </>
                       ) : status === "success" ? (
                         <CheckCircle2 className="w-4 h-4" />
                       ) : (
@@ -472,7 +487,7 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
                           <div className="text-center">
                             <Upload className="w-8 h-8 opacity-20 group-hover:opacity-40 transition-opacity mx-auto mb-3" />
                             <p className="text-[10px] uppercase tracking-widest opacity-40">Select GLB</p>
-                            <p className="text-[8px] uppercase tracking-widest opacity-20 mt-1">Max 10MB for Speed</p>
+                            <p className="text-[8px] uppercase tracking-widest opacity-20 mt-1">Max 10MB (Cloudinary Free)</p>
                           </div>
                         )}
                         <input type="file" accept=".glb" onChange={(e) => setModel(e.target.files?.[0] || null)} className="hidden" />
@@ -483,12 +498,21 @@ export default function AdminPanel({ isOpen, onClose, items }: AdminPanelProps) 
                   <button
                     type="submit"
                     disabled={isUploading || (!editingItem && (!thumbnail || !model)) || !title}
-                    className="w-full bg-white text-black py-5 rounded-xl text-sm font-bold uppercase tracking-[0.2em] hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3"
+                    className="w-full bg-white text-black py-5 rounded-xl text-sm font-bold uppercase tracking-[0.2em] hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex flex-col items-center justify-center gap-2"
                   >
                     {isUploading ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Processing Asset...
+                        <div className="flex items-center gap-3">
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <span>Uploading Archive {Math.round(uploadProgress)}%</span>
+                        </div>
+                        <div className="w-full h-[2px] bg-black/10 mt-2 rounded-full overflow-hidden max-w-xs">
+                          <motion.div 
+                            className="h-full bg-black"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
                       </>
                     ) : status === "success" ? (
                       <>

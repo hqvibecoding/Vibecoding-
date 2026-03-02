@@ -9,10 +9,19 @@ import AdminLogin from "./components/AdminLogin";
 import AdminPanel from "./components/AdminPanel";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { motion, AnimatePresence } from "motion/react";
 import Lenis from "lenis";
 
 export default function App() {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
+  );
+}
+
+function AppContent() {
   const [items, setItems] = useState<ArchiveItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<ArchiveItem | null>(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
