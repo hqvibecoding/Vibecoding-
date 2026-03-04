@@ -4,6 +4,20 @@
 @theme {
   --font-serif: "Cormorant Garamond", serif;
   --font-sans: "Inter", sans-serif;
+
+  --background-radial-gradient: radial-gradient(circle, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 70%);
+}
+
+@utility bg-radial-gradient {
+  background-image: radial-gradient(circle, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 70%);
+}
+
+@utility will-change-transform {
+  will-change: transform;
+}
+
+@utility will-change-opacity {
+  will-change: opacity;
 }
 
 html.lenis {
@@ -26,12 +40,23 @@ html.lenis {
   pointer-events: none;
 }
 
-body {
+html, body {
   background-color: #050505;
   color: #F5F5F5;
   font-family: var(--font-sans);
   overflow-x: hidden;
+  width: 100%;
+  position: relative;
   -webkit-font-smoothing: antialiased;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
 }
 
 .premium-serif {
@@ -41,18 +66,18 @@ body {
 
 .noise-overlay {
   position: fixed;
-  top: -50%;
-  left: -50%;
-  right: -50%;
-  bottom: -50%;
-  width: 200%;
-  height: 200%;
+  top: -10%;
+  left: -10%;
+  right: -10%;
+  bottom: -10%;
+  width: 120%;
+  height: 120%;
   background: transparent url('https://res.cloudinary.com/dj8ge55xe/image/upload/v1708470000/noise_z8j8j8.png') repeat;
   background-repeat: repeat;
   animation: noise 0.2s infinite;
   opacity: 0.05;
   pointer-events: none;
-  z-index: 9998;
+  z-index: 1;
 }
 
 @keyframes noise {

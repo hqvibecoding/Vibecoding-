@@ -70,7 +70,7 @@ function FAQItem({ question, answer, theme = "dark" }: { question: string, answe
 
 export default function FAQ({ theme = "dark" }: { theme?: "dark" | "light" }) {
   return (
-    <section id="faq" className="py-20 md:py-40 px-6 md:px-24">
+    <section id="faq" className="py-20 md:py-40 px-6 md:px-24 overflow-hidden">
       <div className="max-w-[1400px] mx-auto">
         <div className="mb-20 md:mb-32">
           <motion.span 

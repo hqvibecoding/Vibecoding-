@@ -21,7 +21,7 @@ const values = [
 
 export default function UniqueValue({ theme = "dark" }: { theme?: "dark" | "light" }) {
   return (
-    <section className="py-20 md:py-40 px-6 md:px-24">
+    <section className="py-20 md:py-40 px-6 md:px-24 overflow-hidden">
       <div className="max-w-[1400px] mx-auto">
         <div className="mb-20 md:mb-32">
           <motion.span 

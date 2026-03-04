@@ -1,34 +1,52 @@
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Mail, Phone, MessageSquare, CheckCircle2, X } from "lucide-react";
 import { ref, push, serverTimestamp } from "firebase/database";
 import { db } from "../firebase";
+import emailjs from "@emailjs/browser";
 
 export default function Contact({ theme = "dark" }: { theme?: "dark" | "light" }) {
+  const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    user_name: "",
+    user_email: "",
+    user_phone: "",
     message: ""
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setStatusMessage("Sending...");
 
     try {
+      // 1. Save to Firebase (Backup)
       const inquiriesRef = ref(db, "inquiries");
       await push(inquiriesRef, {
         ...formData,
         timestamp: serverTimestamp(),
         status: "new"
       });
+
+      // 2. Send via EmailJS
+      if (formRef.current) {
+        await emailjs.sendForm(
+          "service_2e9wzpp",
+          "template_25mij2p",
+          formRef.current,
+          "Wu5-FXNgBXQwXz2Vl"
+        );
+      }
+
       setIsSubmitted(true);
-      setFormData({ name: "", email: "", phone: "", message: "" });
+      setStatusMessage("Message sent successfully!");
+      setFormData({ user_name: "", user_email: "", user_phone: "", message: "" });
     } catch (error) {
       console.error("Error submitting form:", error);
+      setStatusMessage("Failed to send message. Please try again.");
       alert("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
@@ -54,6 +72,7 @@ export default function Contact({ theme = "dark" }: { theme?: "dark" | "light" }
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-20 md:gap-40">
           <motion.form
+            ref={formRef}
             initial={{ opacity: 0, x: -100 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -65,8 +84,8 @@ export default function Contact({ theme = "dark" }: { theme?: "dark" | "light" }
               <label className="text-[10px] uppercase tracking-[0.3em] opacity-40">Full Name</label>
               <input 
                 required
-                name="name"
-                value={formData.name}
+                name="user_name"
+                value={formData.user_name}
                 onChange={handleChange}
                 type="text" 
                 placeholder="John Doe"
@@ -82,8 +101,8 @@ export default function Contact({ theme = "dark" }: { theme?: "dark" | "light" }
               <label className="text-[10px] uppercase tracking-[0.3em] opacity-40">Business Email</label>
               <input 
                 required
-                name="email"
-                value={formData.email}
+                name="user_email"
+                value={formData.user_email}
                 onChange={handleChange}
                 type="email" 
                 placeholder="john@company.com"
@@ -99,8 +118,8 @@ export default function Contact({ theme = "dark" }: { theme?: "dark" | "light" }
               <label className="text-[10px] uppercase tracking-[0.3em] opacity-40">Phone Number</label>
               <input 
                 required
-                name="phone"
-                value={formData.phone}
+                name="user_phone"
+                value={formData.user_phone}
                 onChange={handleChange}
                 type="tel" 
                 placeholder="+91 7411041972"
@@ -128,14 +147,23 @@ export default function Contact({ theme = "dark" }: { theme?: "dark" | "light" }
               />
               <p className="text-[8px] uppercase tracking-[0.2em] opacity-30 italic">Example: I want to build a 3D showroom for my luxury car brand.</p>
             </div>
-            <button 
-              disabled={isLoading}
-              className={`w-full py-4 sm:py-6 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.4em] transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${
-                theme === "dark" ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800"
-              }`}
-            >
-              {isLoading ? "Sending..." : "Send Inquiry"}
-            </button>
+            <div className="space-y-4">
+              <button 
+                disabled={isLoading}
+                className={`w-full py-4 sm:py-6 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.4em] transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${
+                  theme === "dark" ? "bg-white text-black hover:bg-zinc-200" : "bg-black text-white hover:bg-zinc-800"
+                }`}
+              >
+                {isLoading ? "Sending..." : "Send Inquiry"}
+              </button>
+              {statusMessage && (
+                <p className={`text-[10px] uppercase tracking-[0.2em] text-center ${
+                  statusMessage.includes("successfully") ? "text-emerald-500" : "text-red-500 opacity-60"
+                }`}>
+                  {statusMessage}
+                </p>
+              )}
+            </div>
           </motion.form>
 
           <motion.div 

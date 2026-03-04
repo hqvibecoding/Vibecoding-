@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 
 export default function About({ theme = "dark" }: { theme?: "dark" | "light" }) {
   return (
-    <section id="about" className="py-20 md:py-40 px-6 md:px-24">
+    <section id="about" className="py-20 md:py-40 px-6 md:px-24 overflow-hidden">
       <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-32 items-center">
         <motion.div
           initial={{ opacity: 0, x: -100 }}
