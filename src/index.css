@@ -44,14 +44,19 @@ html, body {
   background-color: #050505;
   color: #F5F5F5;
   font-family: var(--font-sans);
-  overflow-x: hidden;
+  overflow-x: hidden !important;
   width: 100%;
+  max-width: 100vw;
   position: relative;
   -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+  touch-action: pan-y;
 }
 
 *, *::before, *::after {
   box-sizing: border-box;
+  max-width: 100vw;
 }
 
 img, video, canvas, svg {
@@ -66,18 +71,17 @@ img, video, canvas, svg {
 
 .noise-overlay {
   position: fixed;
-  top: -10%;
-  left: -10%;
-  right: -10%;
-  bottom: -10%;
-  width: 120%;
-  height: 120%;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
   background: transparent url('https://res.cloudinary.com/dj8ge55xe/image/upload/v1708470000/noise_z8j8j8.png') repeat;
   background-repeat: repeat;
   animation: noise 0.2s infinite;
   opacity: 0.05;
   pointer-events: none;
   z-index: 1;
+  overflow: hidden;
 }
 
 @keyframes noise {

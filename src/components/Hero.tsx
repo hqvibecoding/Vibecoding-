@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 
 export default function Hero({ theme = "dark" }: { theme?: "dark" | "light" }) {
   return (
-    <section id="home" className="relative min-h-[100dvh] flex flex-col items-center justify-center px-8 overflow-hidden z-10">
+    <section id="home" className="relative min-h-[100dvh] flex flex-col items-center justify-center px-8 overflow-hidden z-10 max-w-[100vw]">
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-radial-gradient opacity-30 ${
           theme === "dark" ? "from-white/5 to-transparent" : "from-black/5 to-transparent"

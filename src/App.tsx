@@ -59,6 +59,7 @@ function AppContent() {
     // Force a refresh after a short delay to ensure correct height calculation on mobile
     setTimeout(() => {
       lenis.resize();
+      window.dispatchEvent(new Event('resize'));
     }, 500);
 
     function raf(time: number) {

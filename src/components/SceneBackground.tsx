@@ -14,6 +14,12 @@ export default function SceneBackground({ theme = "dark" }: { theme?: "dark" | "
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
+    
+    // Force layout recalculation to prevent horizontal shift on mobile
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -27,7 +33,7 @@ export default function SceneBackground({ theme = "dark" }: { theme?: "dark" | "
   }, []);
 
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none opacity-85">
+    <div className="fixed inset-0 z-0 pointer-events-none opacity-85 overflow-hidden max-w-[100vw]">
       <Canvas 
         camera={{ position: [0, 0, 5], fov: 75 }}
         dpr={[1, Math.min(2, window.devicePixelRatio)]}

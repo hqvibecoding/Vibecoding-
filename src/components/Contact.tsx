@@ -58,7 +58,7 @@ export default function Contact({ theme = "dark" }: { theme?: "dark" | "light" }
   };
 
   return (
-    <section id="contact" className="py-20 md:py-40 px-6 md:px-24 relative">
+    <section id="contact" className="py-20 md:py-40 px-6 md:px-24 relative overflow-hidden">
       <div className="max-w-[1400px] mx-auto">
         <div className="mb-20 md:mb-32">
           <span className="text-[10px] uppercase tracking-[1em] opacity-40 mb-6 block">Contact Us</span>
