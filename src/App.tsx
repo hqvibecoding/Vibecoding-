@@ -35,7 +35,7 @@ function AppContent() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [legalType, setLegalType] = useState<"privacy" | "terms" | "cookies" | null>(null);
 
   const { scrollYProgress: scrollProgress } = useScroll();
@@ -45,10 +45,15 @@ function AppContent() {
   };
 
   useEffect(() => {
+    // Scroll to top on refresh to prevent layout shifts
+    window.history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      autoResize: true,
     });
 
     function raf(time: number) {
@@ -94,7 +99,7 @@ function AppContent() {
   }, []);
 
   return (
-    <main className={`min-h-screen transition-colors duration-700 selection:bg-white selection:text-black ${
+    <main className={`min-h-[100dvh] transition-colors duration-700 selection:bg-white selection:text-black ${
       theme === "dark" ? "bg-[#050505] text-[#F5F5F5]" : "bg-[#F5F5F5] text-[#050505]"
     }`}>
       <motion.div 

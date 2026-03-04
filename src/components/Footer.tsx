@@ -42,9 +42,9 @@ export default function Footer({ onAdminClick, onLegalClick, theme = "dark" }: F
       }`} />
 
       <div className="max-w-[1400px] mx-auto relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-16 md:gap-12 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 md:gap-12 mb-24">
           {/* Branding Section */}
-          <div className="space-y-6">
+          <div className="space-y-6 lg:col-span-1">
             <div className="space-y-2">
               <h2 className={`premium-serif text-2xl uppercase tracking-[0.2em] ${
                 theme === "dark" ? "text-white" : "text-black"
@@ -110,23 +110,23 @@ export default function Footer({ onAdminClick, onLegalClick, theme = "dark" }: F
           <div className="space-y-8">
             <h4 className="text-[11px] font-bold uppercase tracking-[0.4em] opacity-30">Contact</h4>
             <div className="space-y-6">
-              <a href="mailto:hellovibecoding@gmail.com" className="group flex items-center gap-4">
-                <div className={`p-3 rounded-xl border transition-all ${
+              <a href="mailto:hellovibecoding@gmail.com" className="group flex items-center gap-4 max-w-full overflow-hidden">
+                <div className={`p-3 rounded-xl border transition-all flex-shrink-0 ${
                   theme === "dark" ? "border-white/5 bg-white/5 group-hover:bg-white/10" : "border-black/5 bg-black/5 group-hover:bg-black/10"
                 }`}>
                   <Mail className="w-4 h-4 opacity-50" />
                 </div>
-                <span className="text-[10px] uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">
+                <span className="text-[10px] uppercase tracking-[0.15em] opacity-60 group-hover:opacity-100 transition-opacity break-all">
                   hellovibecoding@gmail.com
                 </span>
               </a>
               <a href="tel:7411041972" className="group flex items-center gap-4">
-                <div className={`p-3 rounded-xl border transition-all ${
+                <div className={`p-3 rounded-xl border transition-all flex-shrink-0 ${
                   theme === "dark" ? "border-white/5 bg-white/5 group-hover:bg-white/10" : "border-black/5 bg-black/5 group-hover:bg-black/10"
                 }`}>
                   <Phone className="w-4 h-4 opacity-50" />
                 </div>
-                <span className="text-[10px] uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">
+                <span className="text-[10px] uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                   +91 7411041972
                 </span>
               </a>

@@ -44,7 +44,7 @@ export default function Services({ theme = "dark" }: { theme?: "dark" | "light" 
           </motion.h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 lg:gap-16">
           {services.map((s, i) => (
             <motion.div
               key={s.title}
@@ -52,17 +52,17 @@ export default function Services({ theme = "dark" }: { theme?: "dark" | "light" 
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 1.2, delay: i * 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className={`p-6 md:p-10 rounded-3xl border transition-all duration-500 hover:scale-[1.02] ${
+              className={`p-6 md:p-8 lg:p-10 rounded-3xl border transition-all duration-500 hover:scale-[1.02] flex flex-col h-full ${
                 theme === "dark" ? "bg-white/[0.02] border-white/10 hover:bg-white/[0.05]" : "bg-black/[0.02] border-black/10 hover:bg-black/[0.05]"
               }`}
             >
-              <div className={`w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-6 md:mb-8 ${
+              <div className={`w-12 h-12 md:w-14 lg:w-16 rounded-2xl flex items-center justify-center mb-6 md:mb-8 flex-shrink-0 ${
                 theme === "dark" ? "bg-white/10" : "bg-black/10"
               }`}>
-                <s.icon className="w-6 h-6 md:w-8 md:h-8 opacity-60" />
+                <s.icon className="w-6 h-6 md:w-7 lg:w-8 opacity-60" />
               </div>
-              <h3 className="text-lg md:text-2xl font-bold uppercase tracking-widest mb-4 md:mb-6">{s.title}</h3>
-              <p className={`text-xs md:text-base font-light leading-relaxed opacity-50 ${
+              <h3 className="text-lg md:text-xl lg:text-2xl font-bold uppercase tracking-widest mb-4 md:mb-6">{s.title}</h3>
+              <p className={`text-xs md:text-sm lg:text-base font-light leading-relaxed opacity-50 flex-grow ${
                 theme === "dark" ? "text-white" : "text-black"
               }`}>
                 {s.text}

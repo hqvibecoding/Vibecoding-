@@ -18,9 +18,9 @@ function Model({ url }: { url: string }) {
         obj.castShadow = true;
         obj.receiveShadow = true;
         if (obj.material) {
-          obj.material.precision = 'lowp';
+          obj.material.precision = 'highp';
           // Optimize textures if they exist
-          if (obj.material.map) obj.material.map.anisotropy = 4;
+          if (obj.material.map) obj.material.map.anisotropy = 16;
         }
         // Optimize geometry
         if (obj.geometry) {
@@ -239,19 +239,19 @@ export default function ModelViewer({ item, onClose, theme = "dark" }: ModelView
           </div>
         }>
           <Canvas 
-            shadows={!isMobile} 
-            dpr={isMobile ? [1, 1.5] : [1, 2]} 
+            shadows={true} 
+            dpr={[1, Math.min(2, window.devicePixelRatio)]} 
             camera={{ position: [0, 0, 4], fov: 45 }}
             performance={{ min: 0.5 }} 
             gl={{ 
-              antialias: !isMobile, 
+              antialias: true, 
               powerPreference: "high-performance",
               stencil: false,
               depth: true,
               alpha: true,
-              precision: isMobile ? 'mediump' : 'highp', 
+              precision: 'highp', 
               failIfMajorPerformanceCaveat: false,
-              preserveDrawingBuffer: false // Optimize for memory
+              preserveDrawingBuffer: false
             }}
           >
             <Suspense fallback={null}>
