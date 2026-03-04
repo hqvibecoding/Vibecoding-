@@ -4,10 +4,11 @@ import { useRef, useState } from "react";
 
 interface FooterProps {
   onAdminClick: () => void;
+  onLegalClick: (type: "privacy" | "terms" | "cookies") => void;
   theme?: "dark" | "light";
 }
 
-export default function Footer({ onAdminClick, theme = "dark" }: FooterProps) {
+export default function Footer({ onAdminClick, onLegalClick, theme = "dark" }: FooterProps) {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [isHolding, setIsHolding] = useState(false);
 
@@ -16,7 +17,7 @@ export default function Footer({ onAdminClick, theme = "dark" }: FooterProps) {
     timerRef.current = setTimeout(() => {
       onAdminClick();
       setIsHolding(false);
-    }, 5000); // 5 seconds hold
+    }, 5000);
   };
 
   const stopHolding = () => {
@@ -27,94 +28,132 @@ export default function Footer({ onAdminClick, theme = "dark" }: FooterProps) {
     setIsHolding(false);
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <footer className={`py-32 md:py-48 px-6 md:px-12 border-t transition-colors duration-700 relative overflow-hidden ${
+    <footer className={`pt-32 pb-12 px-6 md:px-24 border-t transition-colors duration-700 relative overflow-hidden ${
       theme === "dark" ? "border-white/5 bg-[#050505]" : "border-black/5 bg-white"
     }`}>
-      {/* Subtle Background Glow - Tuned for both themes */}
-      <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] blur-[150px] rounded-full pointer-events-none transition-opacity duration-1000 ${
-        theme === "dark" ? "bg-white/[0.03]" : "bg-black/[0.03]"
+      {/* Subtle Background Glow */}
+      <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] blur-[150px] rounded-full pointer-events-none transition-opacity duration-1000 ${
+        theme === "dark" ? "bg-white/[0.02]" : "bg-black/[0.02]"
       }`} />
 
-      <div className="max-w-7xl mx-auto flex flex-col items-center space-y-16 md:space-y-24 relative z-10">
-        {/* Contact Section */}
-        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-24">
-          <a 
-            href="mailto:hellovibecoding@gmail.com" 
-            className="group flex flex-col items-center gap-3 transition-all duration-500"
-          >
-            <div className={`p-5 rounded-full border transition-all duration-500 ${
-              theme === "dark" 
-                ? "border-white/5 bg-white/[0.02] group-hover:border-white/20 group-hover:bg-white/5" 
-                : "border-black/5 bg-black/[0.02] group-hover:border-black/20 group-hover:bg-black/5"
-            }`}>
-              <Mail className={`w-5 h-5 transition-opacity duration-500 ${
-                theme === "dark" ? "text-white opacity-40 group-hover:opacity-100" : "text-black opacity-40 group-hover:opacity-100"
-              }`} />
+      <div className="max-w-[1400px] mx-auto relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-16 md:gap-12 mb-24">
+          {/* Branding Section */}
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <h2 className={`premium-serif text-2xl uppercase tracking-[0.2em] ${
+                theme === "dark" ? "text-white" : "text-black"
+              }`}>
+                HQ Vibe Coding
+              </h2>
+              <p className="text-[10px] uppercase tracking-[0.3em] opacity-40 leading-relaxed">
+                Premium 3D WebGL Agency.<br />
+                Elevating Digital Experiences.
+              </p>
             </div>
-            <span className={`text-[10px] md:text-[11px] uppercase tracking-[0.4em] transition-opacity duration-500 ${
-              theme === "dark" ? "text-white opacity-40 group-hover:opacity-100" : "text-black opacity-40 group-hover:opacity-100"
-            }`}>
-              hellovibecoding@gmail.com
-            </span>
-          </a>
+          </div>
 
-          <a 
-            href="tel:7411041972" 
-            className="group flex flex-col items-center gap-3 transition-all duration-500"
-          >
-            <div className={`p-5 rounded-full border transition-all duration-500 ${
-              theme === "dark" 
-                ? "border-white/5 bg-white/[0.02] group-hover:border-white/20 group-hover:bg-white/5" 
-                : "border-black/5 bg-black/[0.02] group-hover:border-black/20 group-hover:bg-black/5"
-            }`}>
-              <Phone className={`w-5 h-5 transition-opacity duration-500 ${
-                theme === "dark" ? "text-white opacity-40 group-hover:opacity-100" : "text-black opacity-40 group-hover:opacity-100"
-              }`} />
+          {/* Quick Links */}
+          <div className="space-y-8">
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.4em] opacity-30">Navigation</h4>
+            <ul className="space-y-4">
+              {['Home', 'About', 'Services', 'Portfolio'].map((item) => (
+                <li key={item}>
+                  <a 
+                    href={`#${item.toLowerCase()}`}
+                    className="text-[10px] uppercase tracking-[0.3em] opacity-60 hover:opacity-100 transition-opacity block"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal Links */}
+          <div className="space-y-8">
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.4em] opacity-30">Legal</h4>
+            <ul className="space-y-4">
+              <li>
+                <button 
+                  onClick={() => onLegalClick("privacy")}
+                  className="text-[10px] uppercase tracking-[0.3em] opacity-60 hover:opacity-100 transition-opacity"
+                >
+                  Privacy Policy
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => onLegalClick("terms")}
+                  className="text-[10px] uppercase tracking-[0.3em] opacity-60 hover:opacity-100 transition-opacity"
+                >
+                  Terms of Service
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => onLegalClick("cookies")}
+                  className="text-[10px] uppercase tracking-[0.3em] opacity-60 hover:opacity-100 transition-opacity"
+                >
+                  Cookie Policy
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div className="space-y-8">
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.4em] opacity-30">Contact</h4>
+            <div className="space-y-6">
+              <a href="mailto:hellovibecoding@gmail.com" className="group flex items-center gap-4">
+                <div className={`p-3 rounded-xl border transition-all ${
+                  theme === "dark" ? "border-white/5 bg-white/5 group-hover:bg-white/10" : "border-black/5 bg-black/5 group-hover:bg-black/10"
+                }`}>
+                  <Mail className="w-4 h-4 opacity-50" />
+                </div>
+                <span className="text-[10px] uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">
+                  hellovibecoding@gmail.com
+                </span>
+              </a>
+              <a href="tel:7411041972" className="group flex items-center gap-4">
+                <div className={`p-3 rounded-xl border transition-all ${
+                  theme === "dark" ? "border-white/5 bg-white/5 group-hover:bg-white/10" : "border-black/5 bg-black/5 group-hover:bg-black/10"
+                }`}>
+                  <Phone className="w-4 h-4 opacity-50" />
+                </div>
+                <span className="text-[10px] uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">
+                  +91 7411041972
+                </span>
+              </a>
             </div>
-            <span className={`text-[10px] md:text-[11px] uppercase tracking-[0.4em] transition-opacity duration-500 ${
-              theme === "dark" ? "text-white opacity-40 group-hover:opacity-100" : "text-black opacity-40 group-hover:opacity-100"
-            }`}>
-              +91 7411041972
-            </span>
-          </a>
-        </div>
-
-        {/* Subtle Admin Trigger with 5s Long Press */}
-        <div className="text-center">
-          <motion.button
-            animate={{ 
-              opacity: isHolding ? 0.4 : 0.08,
-              scale: isHolding ? 1.05 : 1
-            }}
-            transition={{ duration: 5, ease: "linear" }}
-            onPointerDown={startHolding}
-            onPointerUp={stopHolding}
-            onPointerLeave={stopHolding}
-            className={`premium-serif text-4xl md:text-8xl font-light tracking-[0.4em] cursor-default select-none outline-none active:scale-95 transition-all duration-300 ${
-              theme === "dark" ? "text-white" : "text-black"
-            }`}
-          >
-            VAULT
-          </motion.button>
-          {isHolding && (
-            <p className={`text-[8px] uppercase tracking-[0.6em] mt-6 animate-pulse ${
-              theme === "dark" ? "text-white opacity-20" : "text-black opacity-20"
-            }`}>
-              Verifying Authority...
-            </p>
-          )}
+          </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className={`w-full pt-12 border-t flex flex-col md:flex-row justify-between items-center gap-6 transition-colors duration-700 ${
+        <div className={`pt-12 border-t flex flex-col md:flex-row justify-between items-center gap-8 ${
           theme === "dark" ? "border-white/5" : "border-black/5"
         }`}>
-          <p className={`text-[9px] md:text-[10px] uppercase tracking-[0.5em] opacity-20 ${
-            theme === "dark" ? "text-white" : "text-black"
-          }`}>
-            © 2026 Vibe Coding. All Rights Reserved.
-          </p>
+          <div className="flex items-center gap-8">
+            <p className="text-[9px] uppercase tracking-[0.4em] opacity-20">
+              Copyright © 2026 HQ Vibe Coding | All Rights Reserved.
+            </p>
+          </div>
+
+          {/* Hidden Admin Trigger */}
+          <motion.button
+            animate={{ opacity: isHolding ? 0.4 : 0.05 }}
+            onPointerDown={startHolding}
+            onPointerUp={stopHolding}
+            onPointerLeave={stopHolding}
+            className="text-[8px] uppercase tracking-[0.8em] cursor-default select-none outline-none"
+          >
+            VAULT
+          </motion.button>
         </div>
       </div>
     </footer>

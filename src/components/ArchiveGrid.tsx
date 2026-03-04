@@ -29,22 +29,24 @@ function GridItem({ item, index, onClick, theme = "dark" }: { item: ArchiveItem,
 
   // Helper to get optimized Cloudinary URL
   const getOptimizedUrl = (url: string) => {
+    if (!url) return "https://picsum.photos/seed/vibe/800/1200";
     if (!url.includes("cloudinary.com")) return url;
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-    const width = isMobile ? 600 : 1200;
-    return url.replace("/upload/", `/upload/f_auto,q_auto:best,w_${width},c_limit/`);
+    const width = isMobile ? 500 : 1000; // Slightly smaller for even faster load
+    // Using q_auto:eco for even faster loading on grid thumbnails
+    return url.replace("/upload/", `/upload/f_auto,q_auto:eco,w_${width},c_limit/`);
   };
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 60 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      initial={{ opacity: 0, y: 100, scale: 0.9 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-100px" }}
       transition={{ 
         duration: 1.5, 
-        ease: [0.215, 0.61, 0.355, 1],
-        delay: (index % 2) * 0.2 
+        ease: [0.16, 1, 0.3, 1],
+        delay: (index % 2) * 0.1 
       }}
       onClick={() => onClick(item)}
       onMouseEnter={() => {
@@ -79,6 +81,10 @@ function GridItem({ item, index, onClick, theme = "dark" }: { item: ArchiveItem,
           alt={item.title}
           loading="lazy"
           onLoad={() => setIsLoaded(true)}
+          onError={(e) => {
+            setIsLoaded(true);
+            (e.target as HTMLImageElement).src = "https://picsum.photos/seed/vibe/800/1200";
+          }}
           className={`w-full h-full object-cover transition-all duration-[2000ms] ease-[0.16,1,0.3,1] group-hover:scale-105 ${
             isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-lg'
           }`}
@@ -87,18 +93,26 @@ function GridItem({ item, index, onClick, theme = "dark" }: { item: ArchiveItem,
         <div className={`absolute inset-0 transition-colors duration-1000 ${
           theme === "dark" ? "bg-black/40 group-hover:bg-black/0" : "bg-white/20 group-hover:bg-white/0"
         }`} />
+        
+        <div className="absolute top-4 right-4 z-20">
+          <div className={`px-2 py-1 rounded-md border text-[8px] font-bold tracking-widest ${
+            theme === "dark" ? "border-white/20 bg-black/50 text-white" : "border-black/20 bg-white/50 text-black"
+          }`}>
+            HD 3D
+          </div>
+        </div>
       </div>
-      <div className="mt-6 md:mt-12 space-y-3 md:space-y-4">
+      <div className="mt-4 md:mt-12 space-y-2 md:space-y-4">
         <div className="flex justify-between items-baseline">
-          <h3 className="premium-serif text-2xl md:text-4xl font-light tracking-tight">{item.title}</h3>
-          <span className="text-[8px] md:text-[9px] uppercase tracking-[0.4em] opacity-20">№ {item.id.slice(-4)}</span>
+          <h3 className="premium-serif text-lg md:text-4xl font-light tracking-tight">{item.title}</h3>
+          <span className="text-[7px] md:text-[9px] uppercase tracking-[0.4em] opacity-20">№ {item.id.slice(-4)}</span>
         </div>
         <div className={`h-px w-full scale-x-0 group-hover:scale-x-100 transition-transform duration-1000 origin-left ${
           theme === "dark" ? "bg-white/5" : "bg-black/5"
         }`} />
         <div className="flex justify-between items-center">
-          <p className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] opacity-30">Interactive Archive</p>
-          <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] opacity-0 group-hover:opacity-100 transition-opacity duration-500">Explore Asset</span>
+          <p className="text-[7px] md:text-[10px] uppercase tracking-[0.3em] opacity-30">Interactive Archive</p>
+          <span className="text-[7px] md:text-[10px] uppercase tracking-[0.3em] opacity-0 group-hover:opacity-100 transition-opacity duration-500">Explore Asset</span>
         </div>
       </div>
     </motion.div>
@@ -107,8 +121,8 @@ function GridItem({ item, index, onClick, theme = "dark" }: { item: ArchiveItem,
 
 export default function ArchiveGrid({ items, onItemClick, theme = "dark" }: ArchiveGridProps) {
   return (
-    <div className="max-w-[1400px] mx-auto px-6 md:px-24">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-40 lg:gap-64">
+    <div className="max-w-[1400px] mx-auto px-4 md:px-24">
+      <div className="grid grid-cols-2 gap-3 sm:gap-8 md:gap-40 lg:gap-64">
         {items.map((item, index) => (
           <GridItem key={item.id} item={item} index={index} onClick={onItemClick} theme={theme} />
         ))}

@@ -131,9 +131,20 @@ interface ModelViewerProps {
 export default function ModelViewer({ item, onClose, theme = "dark" }: ModelViewerProps) {
   const [isIdle, setIsIdle] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [hasWebGL, setHasWebGL] = useState(true);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    const checkWebGL = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        setHasWebGL(!!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))));
+      } catch (e) {
+        setHasWebGL(false);
+      }
+    };
+    checkWebGL();
+
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
     };
@@ -187,32 +198,72 @@ export default function ModelViewer({ item, onClose, theme = "dark" }: ModelView
       </div>
 
       <div className="flex-1 w-full h-full relative">
-        <ErrorBoundary fallback={<ErrorFallback onClose={onClose} />}>
+        {!hasWebGL ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center space-y-8">
+            <img 
+              src={item.thumbnailUrl} 
+              alt={item.title} 
+              className="w-full max-w-md aspect-square object-cover rounded-3xl opacity-40 grayscale"
+              referrerPolicy="no-referrer"
+            />
+            <div className="space-y-4">
+              <p className="text-[10px] uppercase tracking-[0.4em] opacity-60">WebGL Not Supported</p>
+              <h3 className="premium-serif text-2xl">Your device doesn't support 3D rendering.</h3>
+              <button 
+                onClick={onClose}
+                className="px-8 py-4 rounded-full border border-current text-[10px] uppercase tracking-[0.3em] hover:bg-white/10 transition-colors"
+              >
+                Return to Gallery
+              </button>
+            </div>
+          </div>
+        ) : (
+          <ErrorBoundary fallback={
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center space-y-8">
+            <img 
+              src={item.thumbnailUrl} 
+              alt={item.title} 
+              className="w-full max-w-md aspect-square object-cover rounded-3xl opacity-40 grayscale"
+              referrerPolicy="no-referrer"
+            />
+            <div className="space-y-4">
+              <p className="text-[10px] uppercase tracking-[0.4em] opacity-60">WebGL Initialization Failed</p>
+              <h3 className="premium-serif text-2xl">Hardware Limitation Detected.</h3>
+              <button 
+                onClick={onClose}
+                className="px-8 py-4 rounded-full border border-current text-[10px] uppercase tracking-[0.3em] hover:bg-white/10 transition-colors"
+              >
+                Return to Gallery
+              </button>
+            </div>
+          </div>
+        }>
           <Canvas 
-            shadows={!isMobile} // Disable shadows on mobile for performance
-            dpr={isMobile ? [1, 1.5] : [1, 2]} // Lower DPR for mobile
+            shadows={!isMobile} 
+            dpr={isMobile ? [1, 1.5] : [1, 2]} 
             camera={{ position: [0, 0, 4], fov: 45 }}
-            performance={{ min: 0.5 }} // Allow dropping quality to maintain 60fps
+            performance={{ min: 0.5 }} 
             gl={{ 
-              antialias: !isMobile, // Disable antialias on mobile for FPS boost
+              antialias: !isMobile, 
               powerPreference: "high-performance",
               stencil: false,
               depth: true,
               alpha: true,
-              precision: 'lowp', // Lower precision for materials to boost FPS on mobile
-              failIfMajorPerformanceCaveat: false
+              precision: isMobile ? 'mediump' : 'highp', 
+              failIfMajorPerformanceCaveat: false,
+              preserveDrawingBuffer: false // Optimize for memory
             }}
           >
             <Suspense fallback={null}>
               <color attach="background" args={[theme === "dark" ? "#000000" : "#ffffff"]} />
-              <Environment preset="city" resolution={isMobile ? 64 : 128} />
+              <Environment preset="city" resolution={isMobile ? 128 : 512} />
               <Stage 
-                intensity={theme === "dark" ? 0.6 : 1.2} 
+                intensity={theme === "dark" ? 0.8 : 1.5} 
                 adjustCamera={true} 
                 environment="city"
-                shadows={!isMobile} // Disable stage shadows on mobile
+                shadows={!isMobile}
               >
-                <Center>
+                <Center top>
                   <Model url={item.modelUrl} />
                 </Center>
               </Stage>
@@ -235,7 +286,7 @@ export default function ModelViewer({ item, onClose, theme = "dark" }: ModelView
                 maxPolarAngle={Math.PI / 1.75} 
                 makeDefault
               />
-              <AdaptiveDpr pixelated />
+              <AdaptiveDpr pixelated={isMobile} />
               <AdaptiveEvents />
             </Suspense>
           </Canvas>
@@ -253,6 +304,7 @@ export default function ModelViewer({ item, onClose, theme = "dark" }: ModelView
             <ModelPreloader url={item.modelUrl} />
           </Suspense>
         </ErrorBoundary>
+        )}
       </div>
 
       <div className="absolute bottom-10 md:bottom-12 left-1/2 -translate-x-1/2 text-center pointer-events-none">
