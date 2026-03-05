@@ -41,7 +41,7 @@ export default function Header({ theme = "dark", onThemeToggle }: HeaderProps) {
         </div>
         
         <div className="flex items-center gap-3 md:gap-6 lg:gap-8 pointer-events-auto">
-          <nav className="hidden md:flex items-center gap-4 lg:gap-8 mr-2 lg:mr-4">
+          <nav className="hidden lg:flex items-center gap-4 lg:gap-8 mr-2 lg:mr-4">
             {navItems.map((item) => (
               <a
                 key={item}
@@ -83,7 +83,7 @@ export default function Header({ theme = "dark", onThemeToggle }: HeaderProps) {
 
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`md:hidden p-2 rounded-full border transition-all duration-500 ${
+              className={`lg:hidden p-2 rounded-full border transition-all duration-500 ${
                 theme === "dark" 
                   ? "border-white/10 bg-white/5 text-white" 
                   : "border-black/10 bg-black/5 text-black"
@@ -98,9 +98,11 @@ export default function Header({ theme = "dark", onThemeToggle }: HeaderProps) {
               href="https://www.linkedin.com/in/james-jeetendra-a1856a3a5?utm_source=share_via&utm_content=profile&utm_medium=member_android" 
               target="_blank" 
               rel="noopener noreferrer" 
+              aria-label="LinkedIn Profile"
               className="hover:scale-110 transition-transform duration-500 flex-shrink-0"
             >
               <svg className="w-5 h-5 lg:w-6 lg:h-6 fill-[#0077B5]" viewBox="0 0 24 24">
+                <title>LinkedIn</title>
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
               </svg>
             </a>
@@ -109,9 +111,11 @@ export default function Header({ theme = "dark", onThemeToggle }: HeaderProps) {
               href="https://x.com/hqvibecoding" 
               target="_blank" 
               rel="noopener noreferrer" 
+              aria-label="X (Twitter) Profile"
               className="hover:scale-110 transition-transform duration-500 flex-shrink-0"
             >
               <svg className={`w-4 h-4 lg:w-5 lg:h-5 ${theme === "dark" ? "fill-white" : "fill-black"}`} viewBox="0 0 24 24">
+                <title>X (Twitter)</title>
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </a>
@@ -122,7 +126,7 @@ export default function Header({ theme = "dark", onThemeToggle }: HeaderProps) {
           }`}>
             <img 
               src={getOptimizedUrl(profilePic)} 
-              alt="Profile" 
+              alt="HQ Vibe Coding Principal Architect Profile" 
               className="w-full h-full object-cover" 
             />
           </div>
@@ -137,7 +141,7 @@ export default function Header({ theme = "dark", onThemeToggle }: HeaderProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className={`fixed inset-0 z-[90] md:hidden flex flex-col items-center justify-center gap-8 ${
+            className={`fixed inset-0 z-[90] lg:hidden flex flex-col items-center justify-center gap-8 ${
               theme === "dark" ? "bg-black/95 text-white" : "bg-white/95 text-black"
             } backdrop-blur-xl`}
           >

@@ -13,7 +13,7 @@ export default function Hero({ theme = "dark" }: { theme?: "dark" | "light" }) {
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 100 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
         >
           <span className="text-[10px] uppercase tracking-[1em] opacity-40 mb-6 md:mb-8 block">Premium WebGL Experiences</span>
           <h1 className="premium-serif text-5xl sm:text-7xl md:text-[8rem] lg:text-[10rem] font-light leading-none tracking-tighter">
@@ -24,7 +24,7 @@ export default function Hero({ theme = "dark" }: { theme?: "dark" | "light" }) {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 1.5, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-[320px] sm:max-w-xl mx-auto text-[10px] md:text-[12px] uppercase tracking-[0.3em] md:tracking-[0.4em] leading-relaxed opacity-60 font-light"
         >
           We build interactive worlds that turn boring 2D products into immersive journeys. 
@@ -34,7 +34,7 @@ export default function Hero({ theme = "dark" }: { theme?: "dark" | "light" }) {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 1.5, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
           className="pt-12 flex flex-col sm:flex-row items-center justify-center gap-6"
         >
           <a 

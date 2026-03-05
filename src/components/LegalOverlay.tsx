@@ -29,7 +29,7 @@ export default function LegalOverlay({ isOpen, onClose, type, theme = "dark" }: 
         return (
           <div className="space-y-8">
             <h2 className="premium-serif text-4xl md:text-6xl font-light">Privacy Policy<span className="italic opacity-50">.</span></h2>
-            <div className="space-y-6 opacity-70 text-sm md:text-base leading-relaxed font-light">
+            <div className="space-y-6 opacity-90 text-sm md:text-base leading-relaxed font-light">
               <section className="space-y-4">
                 <h3 className="text-lg font-bold uppercase tracking-widest opacity-100">Introduction</h3>
                 <p>At HQ Vibe Coding, we value your privacy. This policy explains how we handle your data.</p>
@@ -61,10 +61,10 @@ export default function LegalOverlay({ isOpen, onClose, type, theme = "dark" }: 
         return (
           <div className="space-y-8">
             <h2 className="premium-serif text-4xl md:text-6xl font-light">Terms of Service<span className="italic opacity-50">.</span></h2>
-            <div className="space-y-6 opacity-70 text-sm md:text-base leading-relaxed font-light">
+            <div className="space-y-6 opacity-90 text-sm md:text-base leading-relaxed font-light">
               <section className="space-y-4">
                 <h3 className="text-lg font-bold uppercase tracking-widest opacity-100">Service Agreement</h3>
-                <p>By using hqvibecoding.netlify.app, you agree to our professional terms.</p>
+                <p>By using our website, you agree to our professional terms.</p>
               </section>
 
               <section className="space-y-4">
@@ -85,7 +85,7 @@ export default function LegalOverlay({ isOpen, onClose, type, theme = "dark" }: 
         return (
           <div className="space-y-8">
             <h2 className="premium-serif text-4xl md:text-6xl font-light">Cookie Policy<span className="italic opacity-50">.</span></h2>
-            <div className="space-y-6 opacity-70 text-sm md:text-base leading-relaxed font-light">
+            <div className="space-y-6 opacity-90 text-sm md:text-base leading-relaxed font-light">
               <section className="space-y-4">
                 <h3 className="text-lg font-bold uppercase tracking-widest opacity-100">Usage</h3>
                 <p>We use essential cookies to ensure our 3D WebGL models run smoothly on your device.</p>
@@ -125,10 +125,10 @@ export default function LegalOverlay({ isOpen, onClose, type, theme = "dark" }: 
             <button
               onClick={onClose}
               className={`absolute top-8 right-8 p-3 rounded-full border transition-all hover:scale-110 active:scale-95 ${
-                theme === "dark" ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-black/10 bg-black/5 hover:bg-black/10"
+                theme === "dark" ? "border-white/20 bg-white/10 hover:bg-white/20" : "border-black/20 bg-black/10 hover:bg-black/20"
               }`}
             >
-              <X className="w-5 h-5 opacity-50" />
+              <X className="w-5 h-5 opacity-100" />
             </button>
 
             {getContent()}

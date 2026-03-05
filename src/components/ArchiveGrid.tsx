@@ -3,7 +3,7 @@ import { ArchiveItem } from "../types";
 import { useGLTF } from "@react-three/drei";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { Loader2 } from "lucide-react";
+import { Loader2, Box } from "lucide-react";
 
 interface ArchiveGridProps {
   items: ArchiveItem[];
@@ -45,7 +45,7 @@ function GridItem({ item, index, onClick, theme = "dark" }: { item: ArchiveItem,
       viewport={{ once: true, margin: "-100px" }}
       transition={{ 
         duration: 1.5, 
-        ease: [0.16, 1, 0.3, 1],
+        ease: [0.22, 1, 0.36, 1],
         delay: (index % 2) * 0.1 
       }}
       onClick={() => onClick(item)}
@@ -78,14 +78,16 @@ function GridItem({ item, index, onClick, theme = "dark" }: { item: ArchiveItem,
 
         <img
           src={getOptimizedUrl(item.thumbnailUrl)}
-          alt={item.title}
+          alt={`3D WebGL Project: ${item.title} by HQ Vibe Coding`}
           loading="lazy"
+          width={500}
+          height={667}
           onLoad={() => setIsLoaded(true)}
           onError={(e) => {
             setIsLoaded(true);
             (e.target as HTMLImageElement).src = "https://picsum.photos/seed/vibe/800/1200";
           }}
-          className={`w-full h-full object-cover transition-all duration-[2000ms] ease-[0.16,1,0.3,1] group-hover:scale-105 ${
+          className={`w-full h-full object-cover transition-all duration-[2000ms] ease-[0.22,1,0.36,1] group-hover:scale-105 ${
             isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-lg'
           }`}
           referrerPolicy="no-referrer"
@@ -99,6 +101,15 @@ function GridItem({ item, index, onClick, theme = "dark" }: { item: ArchiveItem,
             theme === "dark" ? "border-white/20 bg-black/50 text-white" : "border-black/20 bg-white/50 text-black"
           }`}>
             HD 3D
+          </div>
+        </div>
+
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
+          <div className={`px-4 py-2 rounded-full border text-[9px] font-bold tracking-[0.2em] uppercase backdrop-blur-md flex items-center gap-2 whitespace-nowrap shadow-2xl ${
+            theme === "dark" ? "border-white/20 bg-white/10 text-white" : "border-black/20 bg-black/10 text-black"
+          }`}>
+            <Box className="w-3 h-3" />
+            Interactive Demo
           </div>
         </div>
       </div>

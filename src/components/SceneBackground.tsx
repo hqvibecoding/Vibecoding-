@@ -13,14 +13,23 @@ export default function SceneBackground({ theme = "dark" }: { theme?: "dark" | "
       setIsMobile(window.innerWidth < 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
     };
     checkMobile();
-    window.addEventListener('resize', checkMobile);
+    
+    // Use ResizeObserver for more robust sizing
+    const observer = new ResizeObserver(() => {
+      checkMobile();
+      window.dispatchEvent(new Event('resize'));
+    });
+    observer.observe(document.body);
     
     // Force layout recalculation to prevent horizontal shift on mobile
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
     }, 100);
 
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {

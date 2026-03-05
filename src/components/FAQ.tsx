@@ -1,3 +1,4 @@
+import Reveal from "./Reveal";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
@@ -5,7 +6,7 @@ import { Plus, Minus } from "lucide-react";
 const faqs = [
   {
     question: "Will 3D models slow down my website?",
-    answer: "Absolutely not. We utilize optimized WebGL and advanced Lazy Loading techniques to ensure your website loads in under 2 seconds. We never compromise on performance."
+    answer: "Absolutely not. We utilize optimized WebGL and advanced lazy loading techniques to ensure your website loads in under 1 second. We never compromise on performance."
   },
   {
     question: "Will the 3D experience run smoothly on mobile devices?",
@@ -73,29 +74,23 @@ export default function FAQ({ theme = "dark" }: { theme?: "dark" | "light" }) {
     <section id="faq" className="py-20 md:py-40 px-6 md:px-24 overflow-hidden">
       <div className="max-w-[1400px] mx-auto">
         <div className="mb-20 md:mb-32">
-          <motion.span 
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1 }}
-            className="text-[10px] uppercase tracking-[1em] opacity-40 mb-6 block"
-          >
-            The Trust-Builder
-          </motion.span>
-          <motion.h2 
-            initial={{ opacity: 0, y: -50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="premium-serif text-4xl md:text-7xl font-light"
-          >
-            Common Questions<span className="italic opacity-50">.</span>
-          </motion.h2>
+          <Reveal direction="left">
+            <span className="text-[10px] uppercase tracking-[1em] opacity-40 mb-6 block">
+              The Trust-Builder
+            </span>
+          </Reveal>
+          <Reveal direction="up" delay={0.2}>
+            <h2 className="premium-serif text-4xl md:text-7xl font-light">
+              Common Questions<span className="italic opacity-50">.</span>
+            </h2>
+          </Reveal>
         </div>
 
         <div className="max-w-4xl">
-          {faqs.map((faq) => (
-            <FAQItem key={faq.question} {...faq} theme={theme} />
+          {faqs.map((faq, i) => (
+            <Reveal key={faq.question} direction="up" delay={i * 0.1 + 0.4} width="100%">
+              <FAQItem {...faq} theme={theme} />
+            </Reveal>
           ))}
         </div>
       </div>

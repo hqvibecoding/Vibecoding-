@@ -1,25 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { onValue, ref } from "firebase/database";
 import { db } from "./firebase";
 import { ArchiveItem } from "./types";
-import Hero from "./components/Hero";
-import ArchiveGrid from "./components/ArchiveGrid";
-import ModelViewer from "./components/ModelViewer";
-import AdminLogin from "./components/AdminLogin";
-import AdminPanel from "./components/AdminPanel";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import Testimonials from "./components/Testimonials";
-import UniqueValue from "./components/UniqueValue";
-import About from "./components/About";
-import Services from "./components/Services";
-import FAQ from "./components/FAQ";
-import Contact from "./components/Contact";
-import LegalOverlay from "./components/LegalOverlay";
+import Hero from "./components/Hero";
 import SceneBackground from "./components/SceneBackground";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { motion, AnimatePresence, useScroll } from "motion/react";
 import Lenis from "lenis";
+
+// Lazy Loaded Components for Performance
+const About = lazy(() => import("./components/About"));
+const Services = lazy(() => import("./components/Services"));
+const ArchiveGrid = lazy(() => import("./components/ArchiveGrid"));
+const UniqueValue = lazy(() => import("./components/UniqueValue"));
+const Process = lazy(() => import("./components/Process"));
+const Authority = lazy(() => import("./components/Authority"));
+const FAQ = lazy(() => import("./components/FAQ"));
+const Contact = lazy(() => import("./components/Contact"));
+const ModelViewer = lazy(() => import("./components/ModelViewer"));
+const AdminLogin = lazy(() => import("./components/AdminLogin"));
+const AdminPanel = lazy(() => import("./components/AdminPanel"));
+const LegalOverlay = lazy(() => import("./components/LegalOverlay"));
 
 export default function App() {
   return (
@@ -122,57 +125,69 @@ function AppContent() {
         
         <Hero theme={theme} />
         
-        <About theme={theme} />
-        <Services theme={theme} />
-        
-        {isLoading ? (
+        <Suspense fallback={
           <div className="flex flex-col items-center justify-center py-64 gap-8">
             <div className={`w-12 h-12 border border-current border-t-transparent rounded-full animate-spin opacity-20`} />
             <p className="text-[10px] uppercase tracking-[0.4em] opacity-40 animate-pulse">
-              Calibrating 3D Environment... Experience is loading in under 2 seconds.
+              Calibrating 3D Environment...
             </p>
           </div>
-        ) : (
-          <div id="portfolio" className="py-20 md:py-40">
-            <ArchiveGrid items={items} onItemClick={setSelectedItem} theme={theme} />
-          </div>
-        )}
+        }>
+          <About theme={theme} />
+          <Services theme={theme} />
+          
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-64 gap-8">
+              <div className={`w-12 h-12 border border-current border-t-transparent rounded-full animate-spin opacity-20`} />
+              <p className="text-[10px] uppercase tracking-[0.4em] opacity-40 animate-pulse">
+                Calibrating 3D Environment... Experience is loading in under 1 second.
+              </p>
+            </div>
+          ) : (
+            <div id="portfolio" className="py-20 md:py-40">
+              <ArchiveGrid items={items} onItemClick={setSelectedItem} theme={theme} />
+            </div>
+          )}
 
-        <UniqueValue theme={theme} />
-        <Testimonials theme={theme} />
-        <FAQ theme={theme} />
-        <Contact theme={theme} />
+          <UniqueValue theme={theme} />
+          <Process theme={theme} />
+          <Authority theme={theme} />
+          <FAQ theme={theme} />
+          <Contact theme={theme} />
+        </Suspense>
       </div>
 
-      <AnimatePresence mode="wait">
-        {selectedItem && (
-          <ModelViewer 
-            key={selectedItem.id}
-            theme={theme}
-            item={selectedItem} 
-            onClose={() => setSelectedItem(null)} 
-          />
-        )}
-      </AnimatePresence>
+      <Suspense fallback={null}>
+        <AnimatePresence mode="wait">
+          {selectedItem && (
+            <ModelViewer 
+              key={selectedItem.id}
+              theme={theme}
+              item={selectedItem} 
+              onClose={() => setSelectedItem(null)} 
+            />
+          )}
+        </AnimatePresence>
 
-      <AdminLogin 
-        isOpen={isLoginOpen} 
-        onClose={() => setIsLoginOpen(false)} 
-        onLoginSuccess={() => setIsAdminOpen(true)} 
-      />
+        <AdminLogin 
+          isOpen={isLoginOpen} 
+          onClose={() => setIsLoginOpen(false)} 
+          onLoginSuccess={() => setIsAdminOpen(true)} 
+        />
 
-      <AdminPanel 
-        isOpen={isAdminOpen} 
-        onClose={() => setIsAdminOpen(false)} 
-        items={items}
-      />
+        <AdminPanel 
+          isOpen={isAdminOpen} 
+          onClose={() => setIsAdminOpen(false)} 
+          items={items}
+        />
 
-      <LegalOverlay 
-        isOpen={!!legalType} 
-        onClose={() => setLegalType(null)} 
-        type={legalType} 
-        theme={theme} 
-      />
+        <LegalOverlay 
+          isOpen={!!legalType} 
+          onClose={() => setLegalType(null)} 
+          type={legalType} 
+          theme={theme} 
+        />
+      </Suspense>
 
       {!selectedItem && <div className="relative z-10"><Footer onAdminClick={() => setIsLoginOpen(true)} onLegalClick={setLegalType} theme={theme} /></div>}
 
