@@ -33,7 +33,7 @@ export default function Header({ theme = "dark", onThemeToggle }: HeaderProps) {
     <>
       <header className="fixed top-0 left-0 w-full z-[100] px-6 md:px-12 py-6 md:py-8 flex justify-between items-center pointer-events-none">
         <div className="pointer-events-auto">
-          <span className={`font-['Italiana'] text-lg md:text-2xl tracking-[0.3em] md:tracking-[0.4em] uppercase mix-blend-difference ${
+          <span className={`font-['Italiana'] text-lg md:text-2xl tracking-[0.3em] md:tracking-[0.4em] uppercase ${
             theme === "dark" ? "text-white" : "text-black"
           }`}>
             HQ Vibe Coding

@@ -36,13 +36,14 @@ export default function SceneBackground({ theme = "dark" }: { theme?: "dark" | "
     <div className="fixed inset-0 z-0 pointer-events-none opacity-85 overflow-hidden max-w-[100vw]">
       <Canvas 
         camera={{ position: [0, 0, 5], fov: 75 }}
-        dpr={[1, Math.min(2, window.devicePixelRatio)]}
+        dpr={[1, Math.min(1.5, window.devicePixelRatio)]}
         gl={{ 
-          antialias: true, 
+          antialias: false, 
           powerPreference: "high-performance",
           alpha: true,
           stencil: false,
-          depth: true
+          depth: true,
+          precision: 'lowp'
         }}
       >
         <ambientLight intensity={0.8} />
@@ -74,7 +75,7 @@ function BackgroundShape({ meshRef, mouse, theme, isMobile }: { meshRef: any, mo
     <>
       <pointLight ref={lightRef} intensity={2} color={theme === "dark" ? "#ffffff" : "#000000"} />
       <Float speed={2} rotationIntensity={1} floatIntensity={2}>
-      <Sphere ref={meshRef} args={[1, isMobile ? 32 : 128, isMobile ? 32 : 128]} scale={isMobile ? 3 : 3.5}>
+      <Sphere ref={meshRef} args={[1, isMobile ? 16 : 48, isMobile ? 16 : 48]} scale={isMobile ? 3 : 3.5}>
         <MeshDistortMaterial
           color={theme === "dark" ? "#ffffff" : "#000000"}
           speed={3}
@@ -86,7 +87,7 @@ function BackgroundShape({ meshRef, mouse, theme, isMobile }: { meshRef: any, mo
         />
       </Sphere>
       {/* Secondary Glow Sphere */}
-      <Sphere args={[1, isMobile ? 32 : 64, isMobile ? 32 : 64]} scale={isMobile ? 4.5 : 5.5}>
+      <Sphere args={[1, isMobile ? 16 : 32, isMobile ? 16 : 32]} scale={isMobile ? 4.5 : 5.5}>
         <meshBasicMaterial
           color={theme === "dark" ? "#ffffff" : "#000000"}
           transparent

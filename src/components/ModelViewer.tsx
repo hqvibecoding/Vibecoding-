@@ -240,16 +240,16 @@ export default function ModelViewer({ item, onClose, theme = "dark" }: ModelView
         }>
           <Canvas 
             shadows={true} 
-            dpr={[1, Math.min(2, window.devicePixelRatio)]} 
+            dpr={[1, Math.min(1.5, window.devicePixelRatio)]} 
             camera={{ position: [0, 0, 4], fov: 45 }}
             performance={{ min: 0.5 }} 
             gl={{ 
-              antialias: true, 
+              antialias: false, 
               powerPreference: "high-performance",
               stencil: false,
               depth: true,
               alpha: true,
-              precision: 'highp', 
+              precision: 'mediump', 
               failIfMajorPerformanceCaveat: false,
               preserveDrawingBuffer: false
             }}

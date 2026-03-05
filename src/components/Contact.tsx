@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useRef } from "react";
-import { Mail, Phone, MessageSquare, CheckCircle2, X } from "lucide-react";
+import { Mail as MailIcon, Phone, MessageSquare, CheckCircle2, X } from "lucide-react";
 import { ref, push, serverTimestamp } from "firebase/database";
 import { db } from "../firebase";
 import emailjs from "@emailjs/browser";
@@ -177,10 +177,23 @@ export default function Contact({ theme = "dark" }: { theme?: "dark" | "light" }
               <h4 className="text-[11px] font-bold uppercase tracking-[0.4em] opacity-30">Direct Contact</h4>
               <div className="space-y-10">
                 <a href="mailto:hellovibecoding@gmail.com" className="group flex items-center gap-6">
-                  <div className={`p-4 rounded-2xl border transition-all duration-500 ${
-                    theme === "dark" ? "border-white/5 bg-white/5 group-hover:bg-white/10" : "border-black/5 bg-black/5 group-hover:bg-black/10"
+                  <div className={`p-4 md:p-5 rounded-2xl border transition-all duration-500 flex items-center justify-center flex-shrink-0 ${
+                    theme === "dark" ? "border-white/10 bg-white/5 group-hover:bg-white/20" : "border-black/10 bg-black/5 group-hover:bg-black/20"
                   }`}>
-                    <Mail className="w-5 h-5 opacity-50" />
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="24" 
+                      height="24" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="1.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      className={`w-5 h-5 md:w-6 md:h-6 ${theme === "dark" ? "text-white" : "text-black"}`}
+                    >
+                      <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                    </svg>
                   </div>
                   <div>
                     <p className="text-[9px] uppercase tracking-[0.3em] opacity-40 mb-1">Email Us</p>
@@ -188,10 +201,10 @@ export default function Contact({ theme = "dark" }: { theme?: "dark" | "light" }
                   </div>
                 </a>
                 <a href="tel:7411041972" className="group flex items-center gap-6">
-                  <div className={`p-4 rounded-2xl border transition-all duration-500 ${
-                    theme === "dark" ? "border-white/5 bg-white/5 group-hover:bg-white/10" : "border-black/5 bg-black/5 group-hover:bg-black/10"
+                  <div className={`p-4 md:p-5 rounded-2xl border transition-all duration-500 flex items-center justify-center flex-shrink-0 ${
+                    theme === "dark" ? "border-white/10 bg-white/5 group-hover:bg-white/20" : "border-black/10 bg-black/5 group-hover:bg-black/20"
                   }`}>
-                    <Phone className="w-5 h-5 opacity-50" />
+                    <Phone className={`w-5 h-5 md:w-6 md:h-6 ${theme === "dark" ? "text-white" : "text-black"}`} strokeWidth={1.5} />
                   </div>
                   <div>
                     <p className="text-[9px] uppercase tracking-[0.3em] opacity-40 mb-1">Call Us</p>
@@ -199,10 +212,10 @@ export default function Contact({ theme = "dark" }: { theme?: "dark" | "light" }
                   </div>
                 </a>
                 <a href="https://wa.me/917411041972" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-6">
-                  <div className={`p-4 rounded-2xl border transition-all duration-500 ${
-                    theme === "dark" ? "border-white/5 bg-white/5 group-hover:bg-white/10" : "border-black/5 bg-black/5 group-hover:bg-black/10"
+                  <div className={`p-4 md:p-5 rounded-2xl border transition-all duration-500 flex items-center justify-center flex-shrink-0 ${
+                    theme === "dark" ? "border-white/10 bg-white/5 group-hover:bg-white/20" : "border-black/10 bg-black/5 group-hover:bg-black/20"
                   }`}>
-                    <MessageSquare className="w-5 h-5 opacity-50" />
+                    <MessageSquare className={`w-5 h-5 md:w-6 md:h-6 ${theme === "dark" ? "text-white" : "text-black"}`} strokeWidth={1.5} />
                   </div>
                   <div>
                     <p className="text-[9px] uppercase tracking-[0.3em] opacity-40 mb-1">WhatsApp</p>
